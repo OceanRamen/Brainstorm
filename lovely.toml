@@ -1,0 +1,34 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+#   __REALSE_MODE must be off for save-states to work
+[[patches]]
+[patches.pattern]
+target = "conf.lua"
+pattern = "_RELEASE_MODE = true"
+position = "at"
+payload = '_RELEASE_MODE = false'
+match_indent = true
+overwrite = true
+
+#   Inject brainstorm key handler
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = 'if key == "p" then'
+position = "before"
+payload = '''
+local brainstorm = require("brainstorm")
+brainstorm.keyHandler(self, key)
+'''
+match_indent = true
+overwrite = false
+
+#   Add core.lua to module list
+[[patches]]
+[patches.module]
+source = "main.lua"
+before = "main.lua"
+name = "brainstorm"
