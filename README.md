@@ -1,5 +1,3 @@
-#   BRAINSTORM
-
 ![Brainstorm Logo](BrainstormLogo.jpg)
 
 Requires [lovely](https://github.com/ethangreen-dev/lovely-injector)
