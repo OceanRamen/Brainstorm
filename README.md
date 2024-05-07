@@ -1,6 +1,10 @@
 ![Brainstorm Logo](BrainstormLogo.jpg)
 
-Requires [lovely](https://github.com/ethangreen-dev/lovely-injector)
+# About
+Do you ever find yourself spending hours copying and renaming save files just to route a seeded run? **Yes!?** Well say *hello* to **BRAINSTORM**, my easy-to-use save-state mod! Brainstorm allows you to log up to **10** save-states at a time with just the press of a *(two)* button*(s)*!! _"HURRAY!!!"_
+Happy seed routing, my fellow academic weapons!!
+
+Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-injector) to be installed
 
 # How to install: 
 1. Install [lovely](https://github.com/ethangreen-dev/lovely-injector) and follow the installation instructions.
