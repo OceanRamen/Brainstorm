@@ -1,4 +1,4 @@
-#   Brainstorm save-states mod
+#   BRAINSTORM
 Requires [lovely](https://github.com/ethangreen-dev/lovely-injector)
 
 How to install: 
