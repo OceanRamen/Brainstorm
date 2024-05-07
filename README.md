@@ -1,7 +1,6 @@
 ![Brainstorm Logo](BrainstormLogo.jpg)
 
-Requirements:
-- [lovely](https://github.com/ethangreen-dev/lovely-injector)
+Requires [lovely](https://github.com/ethangreen-dev/lovely-injector)
 
 # How to install: 
 1. Install [lovely](https://github.com/ethangreen-dev/lovely-injector) and follow the installation instructions.
