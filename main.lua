@@ -1,14 +1,18 @@
 local global = {}
+--------------------------------
+keybinds = {    -- CHANGE THESE TO ALTER KEYBINDS
+    saveState="z",
+    loadState="x",
+}
+--------------------------------
 local sKeys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}   
-function global.keyHandler(controller, key) --  Function we patched into engine/controller.lua
+function global.keyHandler(controller, key)
     for i, k in ipairs(sKeys) do
-        --  Save
-        if key == k and love.keyboard.isDown("z") then
+        if key == k and love.keyboard.isDown(keybinds.saveState) then
             if G.STAGE == G.STAGES.RUN then compress_and_save(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr', G.ARGS.save_run) end
         end
-        --  Load
-        if key == k and love.keyboard.isDown("x") then
-            G:delete_run()  --  Can double as a faster reset key if slot is empty due to avoiding loading anims
+        if key == k and love.keyboard.isDown(keybinds.loadState) then
+            G:delete_run()
             G.SAVED_GAME = get_compressed(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr')
             if G.SAVED_GAME ~= nil then
                 G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
