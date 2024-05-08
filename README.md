@@ -14,8 +14,8 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 5. Done! You can now reload balatro and use this tool.
 
 Use:
-- Hold z + 0-9 to save a state to slot
-- Hold x + 0-9 to load a state from slot
+- Hold z + 0-6 to save a state to slot
+- Hold x + 0-6 to load a state from slot
 
 # How to adjust keybinds
 1. Open up `main.lua`

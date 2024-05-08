@@ -6,7 +6,7 @@ keybinds = {
     loadState="x",
 }
 
-local sKeys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}   
+local sKeys = {"1", "2", "3", "4", "5", "6"}   
 function global.keyHandler(controller, key)
     for i, k in ipairs(sKeys) do
         if key == k and love.keyboard.isDown(keybinds.saveState) then
