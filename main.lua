@@ -1,10 +1,11 @@
 local global = {}
---------------------------------
-keybinds = {    -- CHANGE THESE TO ALTER KEYBINDS
+
+-- KEYBINDS --
+keybinds = {    
     saveState="z",
     loadState="x",
 }
---------------------------------
+
 local sKeys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}   
 function global.keyHandler(controller, key)
     for i, k in ipairs(sKeys) do

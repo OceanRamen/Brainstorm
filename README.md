@@ -16,3 +16,9 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 Use:
 - Hold z + 0-9 to save a state to slot
 - Hold x + 0-9 to load a state from slot
+
+# How to adjust keybinds
+1. Open up `main.lua`
+2. Locate the line `-- KEYBINDS --`
+3. Adjust the two variables `saveState` and `loadState` to change to your desired keybinds -- Make sure to leave in the quotation marks
+4. Save and exit the file, your keybinds will now be aplied when you next reload the mod! 
