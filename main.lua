@@ -28,8 +28,9 @@ function global.keyHandler(controller, key)
         end
     end
     if key == keybinds.rerollSeed then
+        _stake = G.GAME.stake
         G:delete_run()
-        G:start_run()
+        G:start_run({stake = _stake})
         if printSeed == true then
             print(tostring(G.GAME.pseudorandom.seed))
         end
