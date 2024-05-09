@@ -21,10 +21,11 @@ function global.keyHandler(controller, key)
             end
             G:start_run({savetext = G.SAVED_GAME})
         end
-        if key == keybinds.rerollSeed then
-            G:delete_run()
-            G:start_run()
-        end
+    end
+    if key == keybinds.rerollSeed then
+        G:delete_run()
+        G:start_run()
+        print(tostring(G.GAME.pseudorandom.seed))
     end
 end
 return global
