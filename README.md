@@ -13,12 +13,12 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 4. Place the newly extracted folder into `%AppData%/Balatro/Mods`
 5. Done! You can now reload balatro and use this tool.
 
-Use:
+# Use:
 - Hold `z` + 0-6 to save a state to slot
 - Hold `x`+ 0-6 to load a state from slot
 - Press `t` to reroll the seed, the new seed is printed in the console
 
-# How to adjust keybinds
+# How to adjust keybinds:
 1. Open up `main.lua`
 2. Locate the line `-- KEYBINDS --`
 3. Adjust the keybind variables to change to your desired keybinds -- Make sure to leave in the quotation marks

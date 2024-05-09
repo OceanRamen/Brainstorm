@@ -1,5 +1,10 @@
 local global = {}
 
+-- SETTINGS -- 
+preferences = {
+    printSeed=true,
+}
+
 -- KEYBINDS --
 keybinds = {    
     saveState="z",
@@ -25,7 +30,9 @@ function global.keyHandler(controller, key)
     if key == keybinds.rerollSeed then
         G:delete_run()
         G:start_run()
-        print(tostring(G.GAME.pseudorandom.seed))
+        if printSeed == true then
+            print(tostring(G.GAME.pseudorandom.seed))
+        end
     end
 end
 return global
