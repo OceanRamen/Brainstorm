@@ -4,6 +4,7 @@ local global = {}
 keybinds = {    
     saveState="z",
     loadState="x",
+    rerollSeed="",
 }
 
 local sKeys = {"1", "2", "3", "4", "5", "6"}   
@@ -19,6 +20,10 @@ function global.keyHandler(controller, key)
                 G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
             end
             G:start_run({savetext = G.SAVED_GAME})
+        end
+        if key == keybinds.rerollSeed then
+            G:delete_run()
+            G:start_run()
         end
     end
 end
