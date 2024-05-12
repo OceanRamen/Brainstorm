@@ -16,7 +16,7 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 # Use:
 - Hold `z` + 0-6 to save a state to slot
 - Hold `x`+ 0-6 to load a state from slot
-- Press `t` to reroll the seed, the new seed is printed in the console
+- Press `t` to reroll the seed
 
 # How to adjust keybinds:
 1. Open up `main.lua`
