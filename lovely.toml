@@ -11,7 +11,7 @@ pattern = "if key == 'enter' then key = 'return' end"
 position = "after"
 payload = '''
 local brainstorm = require("brainstorm")
-brainstorm.keyHandler(self, key)
+brainstorm.keyHandler(self, key, dt)
 '''
 match_indent = true
 overwrite = false
