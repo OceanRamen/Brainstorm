@@ -84,10 +84,10 @@ function global.keyHandler(controller, key, dt)
             G:start_run({savetext = G.SAVED_GAME})
         end
     end
-    if key == keybinds.rerollSeed then
+    if key == keybinds.rerollSeed and love.keyboard.isDown('lctrl') then
         _reroll()
     end
-    if key == keybinds.autoreroll then
+    if key == keybinds.autoreroll and love.keyboard.isDown('lctrl') then
         autoRerollActive = not autoRerollActive
     end
 end
@@ -105,5 +105,7 @@ function global.update(dt)
     end
 end
 
+function global.getTarot(cards)
+end
 
 return global

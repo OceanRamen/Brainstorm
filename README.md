@@ -12,8 +12,8 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 # Use:
 - Hold `z` + 0-6 to save a state to slot
 - Hold `x`+ 0-6 to load a state from slot
-- Press `t` to reroll the seed
-- Press `a` to auto-reroll for a certain tag (Default: charm tag)
+- Press `ctrl` + `t` to reroll the seed
+- Press `ctrl` + `a` to auto-reroll for a certain tag (Default: charm tag)
 
 # How to adjust keybinds:
 1. Open up `main.lua`
