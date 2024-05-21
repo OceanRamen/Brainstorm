@@ -16,6 +16,19 @@ brainstorm.keyHandler(self, key, dt)
 match_indent = true
 overwrite = false
 
+#   Inject autoreroll update loop
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "G.FRAMES.MOVE = G.FRAMES.MOVE + 1"
+position = "before"
+payload = '''
+local brainstorm = require("brainstorm")
+brainstorm.update(dt)
+'''
+match_indent = true
+overwrite = false
+
 #   Add core.lua to module list
 [[patches]]
 [patches.module]
