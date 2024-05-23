@@ -14,6 +14,7 @@
 Brainstorm has the capability to save up to 10 save-states through the use of in-game key binds. 
 > To create a save-state: Hold `z + 0-9`
 > To load a save-state:	Hold `x + 0-9`
+
 Each number from 0 - 9 corresponds to a save slot. To overwrite an old save, simply create a new save-state in it's slot. 
 
 ### Fast Rerolling
