@@ -6,30 +6,6 @@ searchForSoul = true
 
 rerollsPerFrame = 1000
 
--- tag_uncommon     =     'Uncommon Tag'
--- tag_rare         =     'Rare Tag'
--- tag_negative     =     'Negative Tag'
--- tag_holo         =     'Holographic Tag'
--- tag_polychrome   =     'Polychrome Tag'
--- tag_investment   =     'Investment Tag'
--- tag_voucher      =     'Voucher Tag'
--- tag_boss         =     'Boss Tag'
--- tag_standard     =     'Standard Tag'
--- tag_charm        =     'Charm Tag'
--- tag_meteor       =     'Meteor Tag'
--- tag_buffoon      =     'Buffoon Tag'  
--- tag_handy        =     'Handy Tag'
--- tag_garbage      =     'Garbage Tag'
--- tag_ethereal     =     'Ethereal Tag'
--- tag_coupon       =     'Coupon Tag'
--- tag_double       =     'Double Tag'
--- tag_juggle       =     'Juggle Tag'
--- tag_d_six        =     'D6 Tag'    
--- tag_top_up       =     'Top-up Tag' 
--- tag_skip         =     'Skip Tag'
--- tag_orbital      =     'Orbital Tag'
--- tag_economy      =     'Economy Tag'
-
 -- KEYBINDS --
 keybinds = {    
     saveState="z",
@@ -279,7 +255,7 @@ function global.remove_attention_text(args)
             if args.backdrop_colour then args.backdrop_colour[4] = math.min(args.backdrop_colour[4], args.fade) end
             args.colour[4] = math.min(args.colour[4], args.fade)
             if args.fade <= 0 then
-              args.AT:remove()
+              if args.AT and args.AT.remove then args.AT:remove() end
               return true
             end
           end
