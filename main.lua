@@ -2,6 +2,7 @@ local global = {}
 
 -- AUTOREROLL CONFIG --
 searchTag = "tag_charm"
+searchForSoul = true
 
 -- tag_uncommon     =     'Uncommon Tag'
 -- tag_rare         =     'Rare Tag'
@@ -54,8 +55,15 @@ function searchParametersMet()
     end
 
     if _tag == searchTag then
-        -- Check if arcana pack from skip has soul in
-        return true
+        if not searchForSoul then return true end
+        -- Check if arcana pack from skip has The Soul
+        global.random_state = copy_table(G.GAME.pseudorandom)
+        for i = 1, 5 do
+            if global.pseudorandom(global.pseudoseed("soul_Tarot1")) > 0.997 then 
+                return true
+            end
+        end
+        return false
     else
         return false
     end
@@ -106,6 +114,31 @@ function global.update(dt)
 end
 
 function global.getTarot(cards)
+end
+
+-- Balatro's pseudorandom functions, but referring to our copy of the RNG state instead
+function global.pseudoseed(key, predict_seed)
+    if key == 'seed' then return math.random() end
+
+    if predict_seed then 
+        local _pseed = pseudohash(key..(predict_seed or ''))
+        _pseed = math.abs(tonumber(string.format("%.13f", (2.134453429141+_pseed*1.72431234)%1)))
+        return (_pseed + (pseudohash(predict_seed) or 0))/2
+    end
+
+    if not global.random_state[key] then 
+        global.random_state[key] = pseudohash(key..(global.random_state.seed or ''))
+    end
+
+    global.random_state[key] = math.abs(tonumber(string.format("%.13f", (2.134453429141+global.random_state[key]*1.72431234)%1)))
+    return (global.random_state[key] + (global.random_state.hashed_seed or 0))/2
+end
+
+function global.pseudorandom(seed, min, max)
+    if type(seed) == 'string' then seed = global.pseudoseed(seed) end
+    math.randomseed(seed)
+    if min and max then return math.random(min, max)
+    else return math.random() end
 end
 
 return global
