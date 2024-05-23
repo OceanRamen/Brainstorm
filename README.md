@@ -12,22 +12,19 @@
 ## Features
 ### Save-States
 Brainstorm has the capability to save up to 10 save-states through the use of in-game key binds. 
-To create a save-state
-:	Hold `z + 0-9`
-To load a save-state
-:	Hold `x + 0-9`
+> To create a save-state: Hold `z + 0-9`
+> To load a save-state:	Hold `x + 0-9`
+
 Each number from 0 - 9 corresponds to a save slot. To overwrite an old save, simply create a new save-state in it's slot. 
 
 ### Fast Rerolling
 Brainstorm allows for super-fast rerolling through the use of an in-game key bind. 
-To fast-roll
-:	Press `Ctrl + t`
+> To fast-roll:	Press `Ctrl + t`
 
 ### Auto-Rerolling
 Brainstorm can automatically reroll for parameters as specified by the user.  
 By default, Auto-Reroll is configured to look for a Round 1 Charm Tag with a Soul inside. 
-To Auto-Reroll
-:	Press `Ctrl + a`
+> To Auto-Reroll:	Press `Ctrl + a`
 ## Configuration
 ### Keybinds
 To adjust key binds, 
