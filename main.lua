@@ -42,6 +42,36 @@ function _reroll()
     G:start_run({stake = _stake})
 end
 
+function _auto_reroll()
+    _stake = G.GAME.stake
+    G:delete_run()
+    --This part is meant to mimic how Balatro rerolls for Gold Stake
+    local extra_num = -0.561892350821
+    seed_found = nil
+    while not seed_found do
+        extra_num = extra_num + 0.561892350821
+        seed_found = random_string(8, extra_num + extra_num + G.CONTROLLER.cursor_hover.T.x*0.33411983 + G.CONTROLLER.cursor_hover.T.y*0.874146 + 0.412311010*G.CONTROLLER.cursor_hover.time)
+        global.random_state = {hashed_seed=pseudohash(seed_found)}
+        _tag = pseudorandom_element(G.P_CENTER_POOLS['Tag'], global.pseudoseed('Tag1'..seed_found)).key
+        if _tag == searchTag then
+            if searchForSoul then
+            -- Check if arcana pack from skip has The Soul
+                soul_found = false
+                for i = 1, 5 do
+                    if pseudorandom(global.pseudoseed("soul_Tarot1"..seed_found)) > 0.997 then 
+                        soul_found = true
+                    end
+                end
+                if not soul_found then seed_found = nil end
+            end
+        else
+            seed_found = nil
+        end
+    end
+    G:start_run({stake = _stake, seed = seed_found})
+    G.GAME.seeded = false
+end
+
 function searchParametersMet()
     if not G or not G.GAME or not G.GAME.round_resets or not G.GAME.round_resets.blind_tags then
         print("One or more variables are nil or undefined")
@@ -105,10 +135,8 @@ function global.update(dt)
         rerollTimer = rerollTimer + dt
         if rerollTimer >= rerollInterval then
             rerollTimer = rerollTimer - rerollInterval
-            _reroll()
-            if searchParametersMet() then
-                autoRerollActive = false
-            end
+            _auto_reroll()
+            autoRerollActive = false
         end
     end
 end
@@ -132,13 +160,6 @@ function global.pseudoseed(key, predict_seed)
 
     global.random_state[key] = math.abs(tonumber(string.format("%.13f", (2.134453429141+global.random_state[key]*1.72431234)%1)))
     return (global.random_state[key] + (global.random_state.hashed_seed or 0))/2
-end
-
-function global.pseudorandom(seed, min, max)
-    if type(seed) == 'string' then seed = global.pseudoseed(seed) end
-    math.randomseed(seed)
-    if min and max then return math.random(min, max)
-    else return math.random() end
 end
 
 return global
