@@ -269,7 +269,7 @@ function global.remove_attention_text(args)
         func = function()
           if not args.start_time then
             args.start_time = G.TIMERS.TOTAL
-            args.text:pop_out(3)
+            if args and args.text and args.text.pop_out then args.text:pop_out(3) end
           else
             --args.AT:align_to_attach()
             args.fade = math.max(0, 1 - 3*(G.TIMERS.TOTAL - args.start_time))
