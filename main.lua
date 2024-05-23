@@ -45,8 +45,6 @@ function _reroll()
 end
 
 function _auto_reroll()
-    _stake = G.GAME.stake
-    G:delete_run()
     local rerollsThisFrame = 0
     --This part is meant to mimic how Balatro rerolls for Gold Stake
     local extra_num = -0.561892350821
@@ -73,6 +71,8 @@ function _auto_reroll()
         end
     end
     if seed_found then
+        _stake = G.GAME.stake
+        G:delete_run()
         G:start_run({stake = _stake, seed = seed_found})
         G.GAME.seeded = false
     end
@@ -148,6 +148,15 @@ function global.update(dt)
             end
         end
     end
+    if not global.reroll_text and autoRerollActive then
+        global.reroll_text = global.attention_text({
+            scale = 1.4, text = "Rerolling...", align = 'cm', offset = {x = 0,y = -3.5},major = G.STAGE == G.STAGES.RUN and G.play or G.title_top
+        })
+    end
+    if global.reroll_text and not autoRerollActive then
+        global.remove_attention_text(global.reroll_text)
+        global.reroll_text = nil
+    end
 end
 
 function global.getTarot(cards)
@@ -169,6 +178,113 @@ function global.pseudoseed(key, predict_seed)
 
     global.random_state[key] = math.abs(tonumber(string.format("%.13f", (2.134453429141+global.random_state[key]*1.72431234)%1)))
     return (global.random_state[key] + (global.random_state.hashed_seed or 0))/2
+end
+
+--Based on Balatro's attention_text
+function global.attention_text(args)
+    args = args or {}
+    args.text = args.text or 'test'
+    args.scale = args.scale or 1
+    args.colour = copy_table(args.colour or G.C.WHITE)
+    args.hold = (args.hold or 0) + 0.1*(G.SPEEDFACTOR)
+    args.pos = args.pos or {x = 0, y = 0}
+    args.align = args.align or 'cm'
+    args.emboss = args.emboss or nil
+
+    args.fade = 1
+
+    if args.cover then
+      args.cover_colour = copy_table(args.cover_colour or G.C.RED)
+      args.cover_colour_l = copy_table(lighten(args.cover_colour, 0.2))
+      args.cover_colour_d = copy_table(darken(args.cover_colour, 0.2))
+    else
+      args.cover_colour = copy_table(G.C.CLEAR)
+    end
+
+    args.uibox_config = {
+      align = args.align or 'cm',
+      offset = args.offset or {x=0,y=0}, 
+      major = args.cover or args.major or nil,
+    }
+
+    G.E_MANAGER:add_event(Event({
+      trigger = 'after',
+      delay = 0,
+      blockable = false,
+      blocking = false,
+      func = function()
+          args.AT = UIBox{
+            T = {args.pos.x,args.pos.y,0,0},
+            definition = 
+              {n=G.UIT.ROOT, config = {align = args.cover_align or 'cm', minw = (args.cover and args.cover.T.w or 0.001) + (args.cover_padding or 0), minh = (args.cover and args.cover.T.h or 0.001) + (args.cover_padding or 0), padding = 0.03, r = 0.1, emboss = args.emboss, colour = args.cover_colour}, nodes={
+                {n=G.UIT.O, config={draw_layer = 1, object = DynaText({scale = args.scale, string = args.text, maxw = args.maxw, colours = {args.colour},float = true, shadow = true, silent = not args.noisy, args.scale, pop_in = 0, pop_in_rate = 6, rotate = args.rotate or nil})}},
+              }}, 
+            config = args.uibox_config
+          }
+          args.AT.attention_text = true
+
+          args.text = args.AT.UIRoot.children[1].config.object
+          args.text:pulse(0.5)
+          
+          if args.cover then
+            Particles(args.pos.x,args.pos.y, 0,0, {
+              timer_type = 'TOTAL',
+              timer = 0.01,
+              pulse_max = 15,
+              max = 0,
+              scale = 0.3,
+              vel_variation = 0.2,
+              padding = 0.1,
+              fill=true,
+              lifespan = 0.5,
+              speed = 2.5,
+              attach = args.AT.UIRoot,
+              colours = {args.cover_colour, args.cover_colour_l, args.cover_colour_d},
+          })
+          end
+          if args.backdrop_colour then
+            args.backdrop_colour = copy_table(args.backdrop_colour)
+            Particles(args.pos.x,args.pos.y,0,0,{
+              timer_type = 'TOTAL',
+              timer = 5,
+              scale = 2.4*(args.backdrop_scale or 1), 
+              lifespan = 5,
+              speed = 0,
+              attach = args.AT,
+              colours = {args.backdrop_colour}
+            })
+          end
+          return true
+      end
+      }))
+      return args
+end
+
+function global.remove_attention_text(args)
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 0,
+        blockable = false,
+        blocking = false,
+        func = function()
+          if not args.start_time then
+            args.start_time = G.TIMERS.TOTAL
+            args.text:pop_out(3)
+          else
+            --args.AT:align_to_attach()
+            args.fade = math.max(0, 1 - 3*(G.TIMERS.TOTAL - args.start_time))
+            if args.cover_colour then args.cover_colour[4] = math.min(args.cover_colour[4], 2*args.fade) end
+            if args.cover_colour_l then args.cover_colour_l[4] = math.min(args.cover_colour_l[4], args.fade) end
+            if args.cover_colour_d then args.cover_colour_d[4] = math.min(args.cover_colour_d[4], args.fade) end
+            if args.backdrop_colour then args.backdrop_colour[4] = math.min(args.backdrop_colour[4], args.fade) end
+            args.colour[4] = math.min(args.colour[4], args.fade)
+            if args.fade <= 0 then
+              args.AT:remove()
+              return true
+            end
+          end
+        end
+      }))
 end
 
 return global
