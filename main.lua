@@ -4,6 +4,8 @@ local global = {}
 searchTag = "tag_charm"
 searchForSoul = true
 
+rerollsPerFrame = 1000
+
 -- tag_uncommon     =     'Uncommon Tag'
 -- tag_rare         =     'Rare Tag'
 -- tag_negative     =     'Negative Tag'
@@ -45,12 +47,14 @@ end
 function _auto_reroll()
     _stake = G.GAME.stake
     G:delete_run()
+    local rerollsThisFrame = 0
     --This part is meant to mimic how Balatro rerolls for Gold Stake
     local extra_num = -0.561892350821
-    seed_found = nil
-    while not seed_found do
+    local seed_found = nil
+    while not seed_found and rerollsThisFrame < rerollsPerFrame do
+        rerollsThisFrame = rerollsThisFrame + 1
         extra_num = extra_num + 0.561892350821
-        seed_found = random_string(8, extra_num + extra_num + G.CONTROLLER.cursor_hover.T.x*0.33411983 + G.CONTROLLER.cursor_hover.T.y*0.874146 + 0.412311010*G.CONTROLLER.cursor_hover.time)
+        seed_found = random_string(8, extra_num + G.CONTROLLER.cursor_hover.T.x*0.33411983 + G.CONTROLLER.cursor_hover.T.y*0.874146 + 0.412311010*G.CONTROLLER.cursor_hover.time)
         global.random_state = {hashed_seed=pseudohash(seed_found)}
         _tag = pseudorandom_element(G.P_CENTER_POOLS['Tag'], global.pseudoseed('Tag1'..seed_found)).key
         if _tag == searchTag then
@@ -68,8 +72,11 @@ function _auto_reroll()
             seed_found = nil
         end
     end
-    G:start_run({stake = _stake, seed = seed_found})
-    G.GAME.seeded = false
+    if seed_found then
+        G:start_run({stake = _stake, seed = seed_found})
+        G.GAME.seeded = false
+    end
+    return seed_found
 end
 
 function searchParametersMet()
@@ -135,8 +142,10 @@ function global.update(dt)
         rerollTimer = rerollTimer + dt
         if rerollTimer >= rerollInterval then
             rerollTimer = rerollTimer - rerollInterval
-            _auto_reroll()
-            autoRerollActive = false
+            seed_found = _auto_reroll()
+            if seed_found then
+                autoRerollActive = false
+            end
         end
     end
 end
