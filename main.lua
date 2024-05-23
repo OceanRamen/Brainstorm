@@ -107,7 +107,7 @@ function searchParametersMet()
 end
 
 
-local sKeys = {"1", "2", "3", "4", "5", "6"}  
+local sKeys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}  
 
 -- Add a flag to track if auto reroll is active
 local autoRerollActive = false
