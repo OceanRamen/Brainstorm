@@ -1,5 +1,7 @@
 ![Brainstorm Logo](BrainstormLogo.jpg)
 
+Developers: @OceanRamen, @MathIsFun0
+
 Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-injector) to be installed
 
 # How to install: 
