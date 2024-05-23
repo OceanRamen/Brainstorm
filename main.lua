@@ -134,11 +134,6 @@ function global.keyHandler(controller, key, dt)
     end
     if key == keybinds.autoreroll and love.keyboard.isDown('lctrl') then
         autoRerollActive = not autoRerollActive
-        if autoRerollActive then
-            global.reroll_text = global.attention_text({
-                scale = 1.4, text = "Rerolling...", align = 'cm', offset = {x = 0,y = -2.7},major = G.play
-            })
-        end
     end
 end
 
@@ -152,6 +147,11 @@ function global.update(dt)
                 autoRerollActive = false
             end
         end
+    end
+    if not global.reroll_text and autoRerollActive then
+        global.reroll_text = global.attention_text({
+            scale = 1.4, text = "Rerolling...", align = 'cm', offset = {x = 0,y = -3.5},major = G.STAGE == G.STAGES.RUN and G.play or G.title_top
+        })
     end
     if global.reroll_text and not autoRerollActive then
         global.remove_attention_text(global.reroll_text)
