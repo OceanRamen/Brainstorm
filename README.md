@@ -30,3 +30,29 @@ Note: Brainstorm requires [lovely](https://github.com/ethangreen-dev/lovely-inje
 
 Example:
 `searchTag = "tag_charm"` -> `searchTag = "tag_rare"`
+
+Variable Name   | Ingame Name
+-------------------------------
+tag_uncommon    | Uncommon Tag
+tag_rare        | Rare Tag
+tag_negative    | Negative Tag
+tag_holo        | Holographic Tag
+tag_polychrome  | Polychrome Tag
+tag_investment  | Investment Tag
+tag_voucher     | Voucher Tag
+tag_boss        | Boss Tag
+tag_standard    | Standard Tag
+tag_charm       | Charm Tag
+tag_meteor      | Meteor Tag
+tag_buffoon     | Buffoon Tag
+tag_handy       | Handy Tag
+tag_garbage     | Garbage Tag
+tag_ethereal    | Ethereal Tag
+tag_coupon      | Coupon Tag
+tag_double      | Double Tag
+tag_juggle      | Juggle Tag
+tag_d_six       | D6 Tag
+tag_top_up      | Top-up Tag
+tag_skip        | Skip Tag
+tag_orbital     | Orbital Tag
+tag_economy     | Economy Tag
