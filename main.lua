@@ -1,5 +1,6 @@
 local global = {}
 
+local lovely = require('lovely')
 local json = require 'dkjson'
 
 local function readFile(filePath)
@@ -22,7 +23,7 @@ local function loadConfig(filePath)
     return config
 end
 
-local configPath = "config.json"
+local configPath = lovely.mod_dir.."/Brainstorm/config.json"
 
 local success, config = pcall(loadConfig, configPath)
 if not success then

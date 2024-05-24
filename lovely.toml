@@ -3,7 +3,12 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
-#   Inject brainstorm key handler
+[[patches]]
+[patches.module]
+source = "dkjson.lua"
+before = "main.lua"
+name = "dkjson"
+
 [[patches]]
 [patches.pattern]
 target = "engine/controller.lua"
@@ -16,7 +21,6 @@ brainstorm.keyHandler(self, key, dt)
 match_indent = true
 overwrite = false
 
-#   Inject autoreroll update loop
 [[patches]]
 [patches.pattern]
 target = "game.lua"
@@ -29,7 +33,6 @@ brainstorm.update(dt)
 match_indent = true
 overwrite = false
 
-#   Add core.lua to module list
 [[patches]]
 [patches.module]
 source = "main.lua"
