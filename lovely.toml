@@ -29,19 +29,6 @@ brainstorm.update(dt)
 match_indent = true
 overwrite = false
 
-#   Inject autoreroll update loop
-[[patches]]
-[patches.pattern]
-target = "main.lua"
-pattern = "return function()"
-position = "before"
-payload = '''
-local brainstorm = require("brainstorm")
-brainstorm.loadConfig()
-'''
-match_indent = true
-overwrite = false
-
 #   Add core.lua to module list
 [[patches]]
 [patches.module]

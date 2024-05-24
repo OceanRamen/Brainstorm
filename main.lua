@@ -2,6 +2,39 @@ local global = {}
 
 local json = require 'dkjson'
 
+local function readFile(filePath)
+    local file, err = io.open(filePath, "r")
+    if not file then
+        error("Could not open file: " .. err)
+    end
+
+    local content = file:read("*all")
+    file:close()
+    return content
+end
+
+local function loadConfig(filePath)
+    local content = readFile(filePath)
+    local config, pos, err = json.decode(content, 1, nil)
+    if err then
+        error("Error parsing JSON at position " .. pos .. ": " .. err)
+    end
+    return config
+end
+
+local configPath = "config.json"
+
+local success, config = pcall(loadConfig, configPath)
+if not success then
+    print("Failed to load config: " .. config)
+    return
+end
+
+print("Keybinds:")
+for action, key in pairs(config.keybinds) do
+    print(action .. ": " .. key)
+end
+
 searchTag = "tag_charm"
 searchForSoul = true
 
@@ -261,41 +294,6 @@ function global.remove_attention_text(args)
           end
         end
       }))
-end
-
-function global.loadConfig()
-    local function readFile(filePath)
-        local file, err = io.open(filePath, "r")
-        if not file then
-            error("Could not open file: " .. err)
-        end
-
-        local content = file:read("*all")
-        file:close()
-        return content
-    end
-
-    local function loadConfig(filePath)
-        local content = readFile(filePath)
-        local config, pos, err = json.decode(content, 1, nil)
-        if err then
-            error("Error parsing JSON at position " .. pos .. ": " .. err)
-        end
-        return config
-    end
-
-    local configPath = "config.json"
-
-    local success, config = pcall(loadConfig, configPath)
-    if not success then
-        print("Failed to load config: " .. config)
-        return
-    end
-
-    print("Keybinds:")
-    for action, key in pairs(config.keybinds) do
-        print(action .. ": " .. key)
-    end
 end
 
 return global
