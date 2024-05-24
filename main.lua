@@ -265,9 +265,9 @@ end
 
 function global.loadConfig()
     local function readFile(filePath)
-        local file = io.open(filePath, "r")
+        local file, err = io.open(filePath, "r")
         if not file then
-            error("Could not open file: " .. filePath)
+            error("Could not open file: " .. err)
         end
 
         local content = file:read("*all")
@@ -279,14 +279,18 @@ function global.loadConfig()
         local content = readFile(filePath)
         local config, pos, err = json.decode(content, 1, nil)
         if err then
-            error("Error parsing JSON: " .. err)
+            error("Error parsing JSON at position " .. pos .. ": " .. err)
         end
         return config
     end
 
     local configPath = "config.json"
 
-    local config = loadConfig(configPath)
+    local success, config = pcall(loadConfig, configPath)
+    if not success then
+        print("Failed to load config: " .. config)
+        return
+    end
 
     print("Keybinds:")
     for action, key in pairs(config.keybinds) do
