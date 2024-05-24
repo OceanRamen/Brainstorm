@@ -1,0 +1,8 @@
+{
+  "keybinds": {
+    "saveState": "z",
+    "loadState": "x",
+    "rerollSeed": "t",
+    "autoreroll": "a"
+  }
+}

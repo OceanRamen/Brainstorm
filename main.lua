@@ -1,12 +1,12 @@
 local global = {}
 
--- AUTOREROLL CONFIG --
+local json = require 'dkjson'
+
 searchTag = "tag_charm"
 searchForSoul = true
 
 rerollsPerFrame = 1000
 
--- KEYBINDS --
 keybinds = {    
     saveState="z",
     loadState="x",
@@ -261,6 +261,37 @@ function global.remove_attention_text(args)
           end
         end
       }))
+end
+
+function global.loadConfig()
+    local function readFile(filePath)
+        local file = io.open(filePath, "r")
+        if not file then
+            error("Could not open file: " .. filePath)
+        end
+
+        local content = file:read("*all")
+        file:close()
+        return content
+    end
+
+    local function loadConfig(filePath)
+        local content = readFile(filePath)
+        local config, pos, err = json.decode(content, 1, nil)
+        if err then
+            error("Error parsing JSON: " .. err)
+        end
+        return config
+    end
+
+    local configPath = "config.json"
+
+    local config = loadConfig(configPath)
+
+    print("Keybinds:")
+    for action, key in pairs(config.keybinds) do
+        print(action .. ": " .. key)
+    end
 end
 
 return global
