@@ -41,13 +41,6 @@ searchForSoul = true
 
 rerollsPerFrame = 1000
 
-keybinds = {    
-    saveState="z",
-    loadState="x",
-    rerollSeed="t",
-    autoreroll="a",
-}
-
 function _reroll()
     _stake = G.GAME.stake
     G:delete_run()
@@ -127,10 +120,10 @@ local rerollTimer = 0
 
 function global.keyHandler(controller, key, dt)
     for i, k in ipairs(sKeys) do
-        if key == k and love.keyboard.isDown(keybinds.saveState) then
+        if key == k and love.keyboard.isDown(config.keybinds.saveState) then
             if G.STAGE == G.STAGES.RUN then compress_and_save(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr', G.ARGS.save_run) end
         end
-        if key == k and love.keyboard.isDown(keybinds.loadState) then
+        if key == k and love.keyboard.isDown(config.keybinds.loadState) then
             G:delete_run()
             G.SAVED_GAME = get_compressed(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr')
             if G.SAVED_GAME ~= nil then
@@ -139,10 +132,10 @@ function global.keyHandler(controller, key, dt)
             G:start_run({savetext = G.SAVED_GAME})
         end
     end
-    if key == keybinds.rerollSeed and love.keyboard.isDown('lctrl') then
+    if key == config.keybinds.rerollSeed and love.keyboard.isDown('lctrl') then
         _reroll()
     end
-    if key == keybinds.autoreroll and love.keyboard.isDown('lctrl') then
+    if key == config.keybinds.autoreroll and love.keyboard.isDown('lctrl') then
         autoRerollActive = not autoRerollActive
     end
 end
