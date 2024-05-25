@@ -77,7 +77,7 @@ function _auto_reroll()
         _stake = G.GAME.stake
         G:delete_run()
         G:start_run({stake = _stake, seed = seed_found})
-        G.GAME.seeded = false
+        G.GAME.seeded_from_brainstorm = true
     end
     return seed_found
 end

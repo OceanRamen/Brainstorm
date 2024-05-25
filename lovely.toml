@@ -33,6 +33,26 @@ brainstorm.update(dt)
 match_indent = true
 overwrite = false
 
+# different seeded color for Brainstorm auto-reroll runs
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '{n=G.UIT.R, config={align = "cm", r = 0.1, colour = G.GAME.seeded and G.C.RED or G.C.BLACK, minw = 1.8, minh = 0.5, padding = 0.1, emboss = 0.05}, nodes={'
+position = "at"
+payload = '{n=G.UIT.R, config={align = "cm", r = 0.1, colour = G.GAME.seeded_from_brainstorm and {145/255,162/255,198/255,1} or G.GAME.seeded and G.C.WHITE or G.C.BLACK, minw = 1.8, minh = 0.5, padding = 0.1, emboss = 0.05}, nodes={'
+match_indent = true
+overwrite = true
+
+# different seeded color for Brainstorm auto-reroll runs
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{n=G.UIT.C, config={align = "cm", minh = h, r = 0.1, minw = score=='defeated_by' and label_w or score_w, colour = (score == 'seed' and G.GAME.seeded) and G.C.RED or G.C.BLACK, emboss = 0.05}, nodes={'''
+position = "at"
+payload = '''{n=G.UIT.C, config={align = "cm", minh = h, r = 0.1, minw = score=='defeated_by' and label_w or score_w, colour = (score == 'seed' and G.GAME.seeded_from_brainstorm) and {145/255,162/255,198/255,1} or (score == 'seed' and G.GAME.seeded) and G.C.RED or G.C.BLACK, emboss = 0.05}, nodes={'''
+match_indent = true
+overwrite = true
+
 [[patches]]
 [patches.module]
 source = "main.lua"
