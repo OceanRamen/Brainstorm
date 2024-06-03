@@ -3,6 +3,11 @@ local global = {}
 local lovely = require('lovely')
 local json = require 'dkjson'
 
+-- auto-reroll search config
+searchTag = "tag_charm"
+searchForSoul = true
+
+
 local function readFile(filePath)
     local file, err = io.open(filePath, "r")
     if not file then
@@ -30,14 +35,6 @@ if not success then
     print("Failed to load config: " .. config)
     return
 end
-
-print("Keybinds:")
-for action, key in pairs(config.keybinds) do
-    print(action .. ": " .. key)
-end
-
-searchTag = "tag_charm"
-searchForSoul = true
 
 rerollsPerFrame = 1000
 
@@ -109,6 +106,14 @@ function searchParametersMet()
     end
 end
 
+function wait(seconds)
+    local start = os.clock()
+    while os.clock() - start < seconds do
+        -- Busy wait
+    end
+end
+
+
 
 local sKeys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}  
 
@@ -120,9 +125,12 @@ local rerollTimer = 0
 
 function global.keyHandler(controller, key, dt)
     for i, k in ipairs(sKeys) do
+        --  Save a state
         if key == k and love.keyboard.isDown(config.keybinds.saveState) then
             if G.STAGE == G.STAGES.RUN then compress_and_save(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr', G.ARGS.save_run) end
+            global.alert_text('Saved state to slot ['..k..']')
         end
+        --  Load a state
         if key == k and love.keyboard.isDown(config.keybinds.loadState) then
             G:delete_run()
             G.SAVED_GAME = get_compressed(G.SETTINGS.profile .. '/' .. 'saveState' .. k .. '.jkr')
@@ -130,6 +138,7 @@ function global.keyHandler(controller, key, dt)
                 G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
             end
             G:start_run({savetext = G.SAVED_GAME})
+            global.alert_text('Loaded save from slot ['..k..']')
         end
     end
     if key == config.keybinds.rerollSeed and love.keyboard.isDown('lctrl') then
@@ -290,4 +299,20 @@ function global.remove_attention_text(args)
       }))
 end
 
+function global.alert_text(text)
+    G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+        attention_text({
+            text = text,
+            scale = 0.7, 
+            hold = 3,
+            major = G.STAGE == G.STAGES.RUN and G.play or G.title_top,
+            backdrop_colour = G.C.SECONDARY_SET.Tarot,
+            align = 'cm',
+            offset = {x = 0, y = -3.5},
+            silent = true
+            })
+            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.06*G.SETTINGS.GAMESPEED, blockable = false, blocking = false, func = function()
+                play_sound('other1', 0.76, 0.4);return true end}))
+    return true end }))
+            end
 return global
