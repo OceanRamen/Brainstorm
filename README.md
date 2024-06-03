@@ -6,7 +6,7 @@
 ## Installation
 1. Install [Lovely](https://github.com/ethangreen-dev/lovely-injector) and follow the manual installation instructions.
 2. Download the [latest release](https://github.com/OceanRamen/Brainstorm/releases/) of Brainstorm.
-3. Unzip the file, and place it in `.../%appdata%/balatro/mods`
+3. Unzip the file, and place it in `.../%appdata%/balatro/mods` -- Make sure the Mod's directory name is 'Brainstorm'^[1]
 4. Reload the game to activate the mod.
 
 ## Features
@@ -66,3 +66,5 @@ Top-up Tag |`tag_top_up` |
 Skip Tag |`tag_skip` |
 Orbital Tag |`tag_orbital` |
 Economy Tag |`tag_economy` |
+
+[^1]: Due to current Lovely limitations, file-handling is quite a nuisance.
