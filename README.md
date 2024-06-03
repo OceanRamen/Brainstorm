@@ -6,7 +6,7 @@
 ## Installation
 1. Install [Lovely](https://github.com/ethangreen-dev/lovely-injector) and follow the manual installation instructions.
 2. Download the [latest release](https://github.com/OceanRamen/Brainstorm/releases/) of Brainstorm.
-3. Unzip the file, and place it in `.../%appdata%/balatro/mods` -- Make sure the Mod's directory name is 'Brainstorm'^[1]
+3. Unzip the file, and place it in `.../%appdata%/balatro/mods` -- Make sure the Mod's directory name is 'Brainstorm' [^1]
 4. Reload the game to activate the mod.
 
 ## Features
