@@ -4,5 +4,6 @@
     "loadState": "x",
     "rerollSeed": "t",
     "autoreroll": "a"
-  }
+  },
+  "pride_mode": true
 }
