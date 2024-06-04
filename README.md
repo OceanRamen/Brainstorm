@@ -29,7 +29,7 @@ By default, Auto-Reroll is configured to look for a Round 1 Charm Tag with a Sou
 ### Keybinds
 To adjust key binds, 
 1. Head to `.../%appdata%/balatro/mods` and locate Brainstorm
-2. Open up `main.lua` and locate the section titled ` -- KEYBINDS --`
+2. Open up `config.json`
 3. Adjust the key bind variables below to change to your desired configuration. 
 4. Save and exit the file, your new key binds will be applied when you next reload the game.
 ### Auto-Reroll
