@@ -35,7 +35,7 @@ To adjust key binds,
 ### Auto-Reroll
 To change the auto-reroll config, 
 1. Head to `.../%appdata%/balatro/mods` and locate Brainstorm
-2. Open up `main.lua` and locate the section titled ` -- AUTOREROLL CONFIG --`
+2. Open up `main.lua` and locate the section titled ` -- auto-reroll search config`
 3. To change the Search Tag that Brainstorm looks for, edit the `searchTag` variable to your chosen tag using the correct variable name as specified in the table below. 
 4. To toggle whether Brainstorm searches for a Soul in the seed's first Tarot pack, change the `searchForSoul` variable to either `true` or `false`.
 5. Save and exit the file, your new key binds will be applied when you next reload the game.
