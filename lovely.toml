@@ -41,7 +41,7 @@ target = "functions/UI_definitions.lua"
 pattern = "create_option_cycle({label = localize('b_set_gamespeed'),scale = 0.8, options = {0.5, 1, 2, 4}, opt_callback = 'change_gamespeed', current_option = (G.SETTINGS.GAMESPEED == 0.5 and 1 or G.SETTINGS.GAMESPEED == 4 and 4 or G.SETTINGS.GAMESPEED + 1)}),"
 position = "at"
 payload = '''
-create_option_cycle({label = localize('b_set_gamespeed'),scale = 0.8, options = {0.5, 1, 2, 4, 8, 16}, opt_callback = 'change_gamespeed', current_option = (G.SETTINGS.GAMESPEED == 0.5 and 1 or G.SETTINGS.GAMESPEED == 4 and 4 or G.SETTINGS.GAMESPEED == 8 and 5 or G.SETTINGS.GAMESPEED == 16 and 6 or G.SETTINGS.GAMESPEED + 1)}),
+create_option_cycle({label = localize('b_set_gamespeed'),scale = 0.8, options = {0.5, 1, 2, 4, 8, 16, 32}, opt_callback = 'change_gamespeed', current_option = (G.SETTINGS.GAMESPEED == 0.5 and 1 or G.SETTINGS.GAMESPEED == 4 and 4 or G.SETTINGS.GAMESPEED == 8 and 5 or G.SETTINGS.GAMESPEED == 16 and 6 or G.SETTINGS.GAMESPEED == 32 and 7 or G.SETTINGS.GAMESPEED + 1)}),
 '''
 match_indent = true
 overwrite = true
@@ -91,6 +91,43 @@ end
 '''
 match_indent = true
 overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "self.LANGUAGES = {"
+position = "after"
+payload = '''
+['BU'] = {font = 1, label = "Balatro University", key = 'BU', beta = nil, button = "Language Feedback", warning = {'This language is still in Beta.', 'Click again to confirm'}},
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if localization ~= nil then"
+position = "before"
+payload = '''
+local brainstorm = require('brainstorm')
+if G.SETTINGS.language == 'BU' then
+  self.localization = assert(loadstring(brainstorm.buLanguage()))()
+  init_localization()
+end
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "if localization ~= nil then"
+position = "at"
+payload = 'if localization ~= nil and G.SETTINGS.language ~= "BU" then'
+match_indent = true
+overwrite = true
+
+
 
 [[patches]]
 [patches.module]

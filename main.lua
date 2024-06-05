@@ -401,5 +401,8 @@ function global.alert_text(text)
     }))
 end
 
+function global.buLanguage()
+    return readFile(lovely.mod_dir .. "/Brainstorm/BU.lua")
+end
 
 return global
