@@ -48,6 +48,17 @@ overwrite = true
 
 [[patches]]
 [patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "function G.UIDEF.settings_tab(tab)"
+position = "after"
+payload = '''
+local brainstorm = require('brainstorm')
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
 target = "game.lua"
 pattern = "local replace_card = Card(self.title_top.T.x, self.title_top.T.y, 1.2*G.CARD_W*SC_scale, 1.2*G.CARD_H*SC_scale, G.P_CARDS.S_A, G.P_CENTERS.c_base)"
 position = "at"
@@ -58,6 +69,33 @@ if brainstorm.config.pride_mode == true then replace_card:set_edition({polychrom
 '''
 match_indent = true
 overwrite = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "local t = create_UIBox_generic_options({back_func = 'options',contents = {create_tabs("
+position = "before"
+payload = '''
+  tabs[#tabs+1] = {
+    label = 'Brainstorm',
+    tab_definition_function = (
+      function(_brainstorm_settings)
+        local brainstorm = require('brainstorm')
+        return {n=G.UIT.ROOT, config={align = "cm", padding = 0.05, colour = G.C.CLEAR}, nodes={
+          create_toggle({label = 'Debug Mode', ref_table = brainstorm.config, ref_value = 'debug_mode', callback = (
+            function(_set_toggle)
+              _RELEASE_MODE = brainstorm.config.debug_mode
+            end
+          )}),
+        }}
+      end
+    ),
+    tab_definition_function_args = 'Brainstorm'
+  }
+'''
+match_indent = true
+overwrite = false
+
 
 [[patches]]
 [patches.pattern]
