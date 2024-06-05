@@ -36,6 +36,7 @@ if not success then
     return
 end
 
+
 rerollsPerFrame = 1000
 
 function _reroll()
@@ -192,9 +193,6 @@ function global.update(dt)
         global.remove_attention_text(global.reroll_text)
         global.reroll_text = nil
     end
-end
-
-function global.getTarot(cards)
 end
 
 -- Balatro's pseudorandom functions, but referring to our copy of the RNG state instead
@@ -402,5 +400,6 @@ function global.alert_text(text)
         end
     }))
 end
+
 
 return global

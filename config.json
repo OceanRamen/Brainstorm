@@ -5,5 +5,6 @@
     "rerollSeed": "t",
     "autoreroll": "a"
   },
+  "debug_mode": false,
   "pride_mode": false
 }

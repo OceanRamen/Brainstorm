@@ -9,6 +9,7 @@ source = "dkjson.lua"
 before = "main.lua"
 name = "dkjson"
 
+
 [[patches]]
 [patches.pattern]
 target = "engine/controller.lua"
@@ -16,6 +17,7 @@ pattern = "if key == 'enter' then key = 'return' end"
 position = "after"
 payload = '''
 local brainstorm = require("brainstorm")
+if brainstorm.config.debug_mode == true then _RELEASE_MODE = false end
 brainstorm.keyHandler(self, key, dt)
 '''
 match_indent = true
@@ -68,6 +70,23 @@ if brainstorm.config.pride_mode == true then
   G.localization.misc.poker_hands['Straight Flush'] = "Gay Flush"
   G.localization.misc.poker_hands['Straight'] = "Gay"
   G.localization.misc.poker_hands['Royal Flush'] = "Royal Gay Flush"
+end
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "love.graphics.setCanvas(G.AA_CANVAS)"
+position = "before"
+payload = '''
+local brainstorm = require("brainstorm")
+if brainstorm.config.debug_mode == true then 
+  love.graphics.push()
+  love.graphics.setColor(G.C.DARK_EDITION[1],G.C.DARK_EDITION[2],G.C.DARK_EDITION[3],1)
+  love.graphics.print("BRAINSTORM DEBUG_MODE", 10, 10+(_RELEASE_MODE and 0 or 20))
+  love.graphics.pop()
 end
 '''
 match_indent = true
