@@ -106,6 +106,19 @@ overwrite = false
 [[patches]]
 [patches.pattern]
 target = "game.lua"
+pattern = "if not (love.filesystem.read('localization/'..G.SETTINGS.language..'.lua')) or G.F_ENGLISH_ONLY then"
+position = "at"
+payload = """
+local brainstorm = require('brainstorm')
+if not (love.filesystem.read('localization/'..G.SETTINGS.language..'.lua')) and not (brainstorm.buLanguage()) or G.F_ENGLISH_ONLY then
+"""
+match_indent = true
+overwrite = true
+
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
 pattern = "if localization ~= nil then"
 position = "before"
 payload = '''
@@ -126,7 +139,6 @@ position = "at"
 payload = 'if localization ~= nil and G.SETTINGS.language ~= "BU" then'
 match_indent = true
 overwrite = true
-
 
 
 [[patches]]
