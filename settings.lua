@@ -1,0 +1,1 @@
+return {["pride_mode"]=false,["autoreroll"]={["searchForSoul"]=true,["searchTagID"]=8,["searchTag"]="tag_charm",},["keybinds"]={["loadState"]="x",["saveState"]="z",["autoReroll"]="a",["rerollSeed"]="t",},}
