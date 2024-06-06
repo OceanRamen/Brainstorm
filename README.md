@@ -1,4 +1,4 @@
-![Brainstorm-mod logo](BrainstormLogo.jpg)
+![Brainstorm-mod logo](Assets/BrainstormLogo.jpg)
 --
 ## Requirements
 - [Lovely](https://github.com/ethangreen-dev/lovely-injector) injector -- Get it here: https://github.com/ethangreen-dev/lovely-injector/releases
