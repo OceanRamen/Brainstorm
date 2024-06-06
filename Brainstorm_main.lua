@@ -8,7 +8,6 @@ function Brainstorm.update(dt)
         Brainstorm.AUTOREROLL.rerollTimer = Brainstorm.AUTOREROLL.rerollTimer + dt
         if Brainstorm.AUTOREROLL.rerollTimer >= Brainstorm.AUTOREROLL.rerollInterval then
             Brainstorm.AUTOREROLL.rerollTimer = Brainstorm.AUTOREROLL.rerollTimer - Brainstorm.AUTOREROLL.rerollInterval
-            print("calling Brainstorm.auto_reroll()")
             seed_found = Brainstorm.auto_reroll()
             if seed_found then
                 Brainstorm.AUTOREROLL.autoRerollActive = false

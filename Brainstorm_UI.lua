@@ -1,12 +1,14 @@
 local lovely = require("lovely")
 local nativefs = require("nativefs")
 
-Brainstorm.SearchTagList = {"tag_uncommon", "tag_rare", "tag_holo", "tag_polychrome", "tag_investment", "tag_voucher", "tag_boss", "tag_charm", "tag_juggle", "tag_double", "tag_coupon", "tag_economy", "tag_skip", "tag_d_six" }
+Brainstorm.SearchTagList = {"tag_uncommon", "tag_rare", "tag_holo", "tag_polychrome", "tag_investment", "tag_voucher",
+                            "tag_boss", "tag_charm", "tag_juggle", "tag_double", "tag_coupon", "tag_economy",
+                            "tag_skip", "tag_d_six"}
 
 Brainstorm.G_FUNCS_options_ref = G.FUNCS.options
 G.FUNCS.options = function(e)
-    Brainstorm.G_FUNCS_options_ref(e)   
-    nativefs.write(lovely.mod_dir.."/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
+    Brainstorm.G_FUNCS_options_ref(e)
+    nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
 
 function create_UIBox_settings()
@@ -51,22 +53,23 @@ function create_UIBox_settings()
                         ref_value = 'debug_mode',
                         callback = (function(_set_toggle)
                             _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
+                            G.F_NO_ACHIEVEMENTS = not Brainstorm.SETTINGS.debug_mode
                         end)
-                    }),
+                    }), 
                     create_option_cycle({
                         label = "AutoReroll Search Tag",
                         scale = 0.8,
                         w = 4,
                         options = Brainstorm.SearchTagList,
                         opt_callback = 'change_search_tag',
-                        current_option = Brainstorm.SETTINGS.autoreroll.searchTagID,
+                        current_option = Brainstorm.SETTINGS.autoreroll.searchTagID
                     }),
                     create_toggle({
                         label = 'Search For Soul',
                         ref_table = Brainstorm.SETTINGS.autoreroll,
-                        ref_value = 'searchForSoul',
+                        ref_value = 'searchForSoul'
                     }),
-                }
+                },
             }
         end),
         tab_definition_function_args = 'Brainstorm'

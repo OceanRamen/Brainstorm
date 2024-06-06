@@ -20,7 +20,7 @@ sources = [
 [[patches]] #   Initialize Brainstorm
 [patches.pattern]
 target = "game.lua"
-pattern = "self.SPEEDFACTOR = 1"
+pattern = "self:load_profile(G.SETTINGS.profile or 1)"
 position = "after"
 payload = "initBrainstorm()"
 match_indent = true
@@ -72,47 +72,5 @@ payload = '''
 local replace_card = Card(self.title_top.T.x, self.title_top.T.y, 1.2*G.CARD_W*SC_scale, 1.2*G.CARD_H*SC_scale, G.P_CENTERS.j_brainstorm, {order = 138,  unlocked = true, discovered = true, blueprint_compat = true, perishable_compat = true, eternal_compat = true, rarity = 3, cost = 10, name = "Brainstorm", pos = {x=7,y=7}, set = "Joker", effect = "Copycat", config = {}, unlock_condition = {type = 'discard_custom'}})
 if Brainstorm.SETTINGS.pride_mode == true then replace_card:set_edition({polychrome = true}, true) end
 '''
-match_indent = true
-overwrite = true
-
-[[patches]] #   Add Balatro University Language Option to Font Selection Menu
-[patches.pattern]
-target = "game.lua"
-pattern = "self.LANGUAGES = {"
-position = "after"
-payload = '''
-['BU'] = {font = 1, label = "Balatro University", key = 'BU', beta = nil, button = "Language Feedback", warning = {'This language is still in Beta.', 'Click again to confirm'}},
-'''
-match_indent = true
-overwrite = false
-[[patches]] #   Bypass Language-in-Dir Check
-[patches.pattern]
-target = "game.lua"
-pattern = "if not (love.filesystem.read('localization/'..G.SETTINGS.language..'.lua')) or G.F_ENGLISH_ONLY then"
-position = "at"
-payload = """
-if not (love.filesystem.read('localization/'..G.SETTINGS.language..'.lua')) and not (Brainstorm.BU()) or G.F_ENGLISH_ONLY then
-"""
-match_indent = true
-overwrite = true
-[[patches]] #   Load BU Language if Selected
-[patches.pattern]
-target = "game.lua"
-pattern = "if localization ~= nil then"
-position = "before"
-payload = '''
-if G.SETTINGS.language == 'BU' then
-  self.localization = assert(loadstring(Brainstorm.BU()))()
-  init_localization()
-end
-'''
-match_indent = true
-overwrite = false
-[[patches]] #   Bypass Another Language-in-Dir Check
-[patches.pattern]
-target = "game.lua"
-pattern = "if localization ~= nil then"
-position = "at"
-payload = 'if localization ~= nil and G.SETTINGS.language ~= "BU" then'
 match_indent = true
 overwrite = true
