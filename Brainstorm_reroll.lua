@@ -21,14 +21,11 @@ function FastReroll()
     G.forced_seed, G.setup_seed = nil, nil
     if G.GAME.seeded then G.forced_seed = G.GAME.pseudorandom.seed end
     G.forced_stake = G.GAME.stake
-    G.forced_stake = nil
-    G.challenge_tab = nil
-    G.forced_seed = nil
     local _seed = G.run_setup_seed and G.setup_seed or G.forced_seed or nil
-    local _challenge = G.challenge_tab or nil
+    local _challenge = G.challenge_tab
     local _stake = G.forced_stake or G.PROFILES[G.SETTINGS.profile].MEMORY.stake or 1
     G:delete_run()
-    G:start_run(e, {stake = _stake, seed = _seed, challenge = _challenge})
+    G:start_run({stake = _stake, seed = _seed, challenge = _challenge})
 end
 
 function Brainstorm.auto_reroll()
@@ -68,7 +65,8 @@ function Brainstorm.auto_reroll()
         G:delete_run()
         G:start_run({
             stake = _stake,
-            seed = seed_found
+            seed = seed_found,
+            challenge = G.GAME and G.GAME.challenge and G.GAME.challenge_tab
         })
         G.GAME.seeded = false
     end
