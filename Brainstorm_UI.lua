@@ -10,83 +10,55 @@ G.FUNCS.options = function(e)
     Brainstorm.G_FUNCS_options_ref(e)
     nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
-
-function create_UIBox_settings()
-    local tabs = {}
-    tabs[#tabs + 1] = {
-        label = localize('b_set_game'),
-        chosen = true,
-        tab_definition_function = G.UIDEF.settings_tab,
-        tab_definition_function_args = 'Game'
-    }
-    if G.F_VIDEO_SETTINGS then
-        tabs[#tabs + 1] = {
-            label = localize('b_set_video'),
-            tab_definition_function = G.UIDEF.settings_tab,
-            tab_definition_function_args = 'Video'
+local ct = create_tabs
+function create_tabs(args)
+    if args and args.tab_h == 7.05 then
+        args.tabs[#args.tabs + 1] = {
+            label = 'Brainstorm',
+            tab_definition_function = (function()
+                return {
+                    n = G.UIT.ROOT,
+                    config = {
+                        align = "cm",
+                        padding = 0.05,
+                        colour = G.C.CLEAR
+                    },
+                    nodes = {
+                        create_toggle({
+                            label = 'Debug Mode',
+                            ref_table = Brainstorm.SETTINGS,
+                            ref_value = 'debug_mode',
+                            callback = (function(_set_toggle)
+                                _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
+                                G.F_NO_ACHIEVEMENTS = Brainstorm.SETTINGS.debug_mode
+                            end)
+                        }), 
+                        create_toggle({
+                            label = 'Pride Mode',
+                            ref_table = Brainstorm.SETTINGS,
+                            ref_value = 'pride_mode',
+                        }), 
+                        create_option_cycle({
+                            label = "AutoReroll Search Tag",
+                            scale = 0.8,
+                            w = 4,
+                            options = Brainstorm.SearchTagList,
+                            opt_callback = 'change_search_tag',
+                            current_option = Brainstorm.SETTINGS.autoreroll.searchTagID
+                        }),
+                        create_toggle({
+                            label = 'Search For Soul',
+                            ref_table = Brainstorm.SETTINGS.autoreroll,
+                            ref_value = 'searchForSoul'
+                        }),
+                    },
+                }
+            end),
+            tab_definition_function_args = 'Brainstorm'
         }
     end
-    tabs[#tabs + 1] = {
-        label = localize('b_set_graphics'),
-        tab_definition_function = G.UIDEF.settings_tab,
-        tab_definition_function_args = 'Graphics'
-    }
-    tabs[#tabs + 1] = {
-        label = localize('b_set_audio'),
-        tab_definition_function = G.UIDEF.settings_tab,
-        tab_definition_function_args = 'Audio'
-    }
-    tabs[#tabs + 1] = {
-        label = 'Brainstorm',
-        tab_definition_function = (function()
-            return {
-                n = G.UIT.ROOT,
-                config = {
-                    align = "cm",
-                    padding = 0.05,
-                    colour = G.C.CLEAR
-                },
-                nodes = {
-                    create_toggle({
-                        label = 'Debug Mode',
-                        ref_table = Brainstorm.SETTINGS,
-                        ref_value = 'debug_mode',
-                        callback = (function(_set_toggle)
-                            _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
-                            G.F_NO_ACHIEVEMENTS = Brainstorm.SETTINGS.debug_mode
-                        end)
-                    }), 
-                    create_option_cycle({
-                        label = "AutoReroll Search Tag",
-                        scale = 0.8,
-                        w = 4,
-                        options = Brainstorm.SearchTagList,
-                        opt_callback = 'change_search_tag',
-                        current_option = Brainstorm.SETTINGS.autoreroll.searchTagID
-                    }),
-                    create_toggle({
-                        label = 'Search For Soul',
-                        ref_table = Brainstorm.SETTINGS.autoreroll,
-                        ref_value = 'searchForSoul'
-                    }),
-                },
-            }
-        end),
-        tab_definition_function_args = 'Brainstorm'
-    }
-
-    local t = create_UIBox_generic_options({
-        back_func = 'options',
-        contents = {create_tabs({
-            tabs = tabs,
-            tab_h = 7.05,
-            tab_alignment = 'tm',
-            snap_to_nav = true
-        })}
-    })
-    return t
+    return ct(args)
 end
-
 function saveManagerAlert(text)
     G.E_MANAGER:add_event(Event({
         trigger = "after",
