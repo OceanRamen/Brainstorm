@@ -53,7 +53,7 @@ function create_UIBox_settings()
                         ref_value = 'debug_mode',
                         callback = (function(_set_toggle)
                             _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
-                            G.F_NO_ACHIEVEMENTS = not Brainstorm.SETTINGS.debug_mode
+                            G.F_NO_ACHIEVEMENTS = Brainstorm.SETTINGS.debug_mode
                         end)
                     }), 
                     create_option_cycle({
