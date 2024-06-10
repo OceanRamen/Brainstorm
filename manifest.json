@@ -1,10 +1,10 @@
 {
-    "name": "Brainstorm",
-    "version_number": "1.0.0-Beta",
-    "website_url": "https://github.com/OceanRamen/Brainstorm",
-    "description": "A Quality-of-Life Mod for Balatro",
-    "dependencies": [
-        "Thunderstore-lovely-0.5.0",
-        "metherul-nativefs-1.0.0"
-    ]
+  "name": "Brainstorm",
+  "version_number": "1.0.0-Beta",
+  "website_url": "https://github.com/OceanRamen/Brainstorm",
+  "description": "A Quality-of-Life Mod for Balatro",
+  "dependencies": [
+    "Thunderstore-lovely-0.5.0",
+    "metherul-nativefs-1.0.0"
+  ]
 }

@@ -13,9 +13,7 @@ name = 'nativefs'
 [patches.copy]
 target = "main.lua"
 position = "append"
-sources = [
-    "Brainstorm.lua"
-]
+sources = ["Brainstorm.lua"]
 
 [[patches]] #   Initialize Brainstorm
 [patches.pattern]
@@ -38,7 +36,7 @@ create_option_cycle({label = localize('b_set_gamespeed'),scale = 0.8, options = 
 match_indent = true
 overwrite = true
 [[patches]] #   DebugMode Watermark
-[patches.pattern] 
+[patches.pattern]
 target = "game.lua"
 pattern = "love.graphics.setCanvas(G.AA_CANVAS)"
 position = "before"
