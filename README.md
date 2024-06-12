@@ -1,4 +1,4 @@
-![Brainstorm-mod logo](BrainstormLogo.jpg)
+![Brainstorm-mod logo](Assets/BrainstormLogo.jpg)
 --
 ## Requirements
 - [Lovely](https://github.com/ethangreen-dev/lovely-injector) injector -- Get it here: https://github.com/ethangreen-dev/lovely-injector/releases
@@ -11,60 +11,17 @@
 
 ## Features
 ### Save-States
-Brainstorm has the capability to save up to 10 save-states through the use of in-game key binds. 
-> To create a save-state: Hold `z + 0-9`
-> To load a save-state:	Hold `x + 0-9`
+Brainstorm has the capability to save up to 5 save-states through the use of in-game key binds. 
+> To create a save-state: Hold `z + 1-5`
+> To load a save-state:	Hold `x + 1-5`
 
-Each number from 0 - 9 corresponds to a save slot. To overwrite an old save, simply create a new save-state in it's slot. 
+Each number from 0 - 5 corresponds to a save slot. To overwrite an old save, simply create a new save-state in it's slot. 
 
 ### Fast Rerolling
 Brainstorm allows for super-fast rerolling through the use of an in-game key bind. 
 > To fast-roll:	Press `Ctrl + t`
 
 ### Auto-Rerolling
-Brainstorm can automatically reroll for parameters as specified by the user.  
-By default, Auto-Reroll is configured to look for a Round 1 Charm Tag with a Soul inside. 
+Brainstorm can automatically reroll for parameters as specified by the user.
+You can edit the Auto-Reroll parameters in the Brainstorm in-game settings page.
 > To Auto-Reroll:	Press `Ctrl + a`
-## Configuration
-### Keybinds
-To adjust key binds, 
-1. Head to `.../%appdata%/balatro/mods` and locate Brainstorm
-2. Open up `config.json`
-3. Adjust the key bind variables below to change to your desired configuration. 
-4. Save and exit the file, your new key binds will be applied when you next reload the game.
-### Auto-Reroll
-To change the auto-reroll config, 
-1. Head to `.../%appdata%/balatro/mods` and locate Brainstorm
-2. Open up `main.lua` and locate the section titled ` -- auto-reroll search config`
-3. To change the Search Tag that Brainstorm looks for, edit the `searchTag` variable to your chosen tag using the correct variable name as specified in the table below. 
-4. To toggle whether Brainstorm searches for a Soul in the seed's first Tarot pack, change the `searchForSoul` variable to either `true` or `false`.
-5. Save and exit the file, your new key binds will be applied when you next reload the game.
-
-Search-Tag table
-In-game Name |Variable Name |
-----------------|----------------|
-Uncommon Tag |`tag_uncommon` |
-Rare Tag |`tag_rare` |
-Negative Tag |`tag_negative` |
-Holographic Tag|`tag_holo` |
-Polychrome Tag |`tag_polychrome` |
-Investment Tag |`tag_investment` |
-Voucher Tag |`tag_voucher` |
-Boss Tag |`tag_boss` |
-Standard Tag |`tag_standard` |
-Charm Tag |`tag_charm` |
-Meteor Tag |`tag_meteor` |
-Buffoon Tag |`tag_buffoon` |
-Handy Tag |`tag_handy` |
-Garbage Tag |`tag_garbage` |
-Ethereal Tag |`tag_ethereal` |
-Coupon Tag |`tag_coupon` |
-Double Tag |`tag_double` |
-Juggle Tag |`tag_juggle` |
-D6 Tag |`tag_d_six` |
-Top-up Tag |`tag_top_up` |
-Skip Tag |`tag_skip` |
-Orbital Tag |`tag_orbital` |
-Economy Tag |`tag_economy` |
-
-[^1]: Due to current Lovely limitations, file-handling is quite a nuisance.
