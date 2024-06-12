@@ -46,11 +46,6 @@ function create_tabs(args)
 								G.F_NO_ACHIEVEMENTS = Brainstorm.SETTINGS.debug_mode
 							end,
 						}),
-						create_toggle({
-							label = "Pride Mode",
-							ref_table = Brainstorm.SETTINGS,
-							ref_value = "pride_mode",
-						}),
 						create_option_cycle({
 							label = "AutoReroll Search Tag",
 							scale = 0.8,

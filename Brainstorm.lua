@@ -6,7 +6,6 @@ function initBrainstorm()
 	assert(load(nativefs.read(lovely.mod_dir .. "/Brainstorm/Brainstorm_UI.lua")))()
 	assert(load(nativefs.read(lovely.mod_dir .. "/Brainstorm/Brainstorm_keyhandler.lua")))()
 	assert(load(nativefs.read(lovely.mod_dir .. "/Brainstorm/Brainstorm_reroll.lua")))()
-	assert(load(nativefs.read(lovely.mod_dir .. "/Brainstorm/Brainstorm_language.lua")))()
 	if nativefs.getInfo(lovely.mod_dir .. "/Brainstorm/settings.lua") then
 		local settings_file = STR_UNPACK(nativefs.read((lovely.mod_dir .. "/Brainstorm/settings.lua")))
 		if settings_file ~= nil then
