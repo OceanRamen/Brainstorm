@@ -24,7 +24,11 @@ function FastReroll()
 	G.forced_stake = G.GAME.stake
 	local _seed = G.run_setup_seed and G.setup_seed or G.forced_seed or nil
 	local _challenge = G.challenge_tab
-	local _stake = G.forced_stake or G.PROFILES[G.SETTINGS.profile].MEMORY.stake or 1
+	if not G.challenge_tab then
+		_stake = G.forced_stake or G.PROFILES[G.SETTINGS.profile].MEMORY.stake or 1
+	else
+		_stake = 1
+	end
 	G:delete_run()
 	G:start_run({ stake = _stake, seed = _seed, challenge = _challenge })
 end
