@@ -37,13 +37,13 @@ function Controller:key_press_update(key, dt)
 			})
 			saveManagerAlert("Loaded save from slot [" .. k .. "]")
 		end
-		--  FastReroll
-		if key == Brainstorm.SETTINGS.keybinds.rerollSeed and love.keyboard.isDown("lctrl") then
-			FastReroll()
-		end
-		if key == Brainstorm.SETTINGS.keybinds.autoReroll and love.keyboard.isDown("lctrl") then
-			Brainstorm.AUTOREROLL.autoRerollActive = not Brainstorm.AUTOREROLL.autoRerollActive
-		end
+  end
+	--  FastReroll
+	if key == Brainstorm.SETTINGS.keybinds.rerollSeed and love.keyboard.isDown("lctrl") then
+		FastReroll()
+	end
+	if key == Brainstorm.SETTINGS.keybinds.autoReroll and love.keyboard.isDown("lctrl") then
+		Brainstorm.AUTOREROLL.autoRerollActive = not Brainstorm.AUTOREROLL.autoRerollActive
 	end
 
 	if self.text_input_hook then

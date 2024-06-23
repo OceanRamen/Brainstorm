@@ -21,11 +21,11 @@ function FastReroll()
 	if G.GAME.seeded then
 		G.forced_seed = G.GAME.pseudorandom.seed
 	end
-	G.forced_stake = G.GAME.stake
+	local current_stake = G.GAME.stake
 	local _seed = G.run_setup_seed and G.setup_seed or G.forced_seed or nil
 	local _challenge = G.challenge_tab
 	if not G.challenge_tab then
-		_stake = G.forced_stake or G.PROFILES[G.SETTINGS.profile].MEMORY.stake or 1
+		_stake = current_stake or G.PROFILES[G.SETTINGS.profile].MEMORY.stake or 1
 	else
 		_stake = 1
 	end
