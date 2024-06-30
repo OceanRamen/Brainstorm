@@ -1,1 +1,1 @@
-return {["debug_mode"]=false,["keybinds"]={["loadState"]="x",["saveState"]="z",["autoReroll"]="a",["rerollSeed"]="t",},["autoreroll"]={["searchForSoul"]=true,["searchTag"]="tag_charm",["searchTagID"]=8,},}
+return {["hide_played"]=true,["autoreroll"]={["searchForSoul"]=false,["searchTagID"]=13,["searchTag"]="tag_charm",},["keybinds"]={["loadState"]="x",["saveState"]="z",["autoReroll"]="a",["rerollSeed"]="t",},["debug_mode"]=false,}

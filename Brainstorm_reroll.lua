@@ -5,8 +5,11 @@ Brainstorm.AUTOREROLL = {}
 Brainstorm.AUTOREROLL.rerollsPerFrame = 1000
 
 G.FUNCS.change_search_tag = function(x)
+  print(Brainstorm.FUNCS.inspect(x))
 	Brainstorm.SETTINGS.autoreroll.searchTagID = x.to_key
-	Brainstorm.SETTINGS.autoreroll.searchTag = x.to_val
+	Brainstorm.SETTINGS.autoreroll.searchTag = Brainstorm.SearchTagList[x.to_val]
+  print(x.to_key .. Brainstorm.SearchTagList[x.to_val])
+	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
 
 Brainstorm.AUTOREROLL.autoRerollActive = false

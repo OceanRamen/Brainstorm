@@ -44,7 +44,7 @@ payload = '''
 if Brainstorm.SETTINGS.debug_mode == true then 
   love.graphics.push()
   love.graphics.setColor(G.C.DARK_EDITION[1],G.C.DARK_EDITION[2],G.C.DARK_EDITION[3],1)
-  love.graphics.print("BRAINSTORM DEBUG_MODE", 10, 10+(_RELEASE_MODE and 0 or 20))
+  love.graphics.print("BRAINSTORM DEBUG_MODE", 10, -40)
   love.graphics.pop()
 end
 '''

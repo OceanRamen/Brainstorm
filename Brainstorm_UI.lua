@@ -1,27 +1,35 @@
 local lovely = require("lovely")
 local nativefs = require("nativefs")
 
+
+
 Brainstorm.SearchTagList = {
-	"tag_uncommon",
-	"tag_rare",
-	"tag_holo",
-	"tag_polychrome",
-	"tag_investment",
-	"tag_voucher",
-	"tag_boss",
-	"tag_charm",
-	"tag_juggle",
-	"tag_double",
-	"tag_coupon",
-	"tag_economy",
-	"tag_skip",
-	"tag_d_six",
+	["Uncommon Tag"]="tag_uncommon",
+	["Rare Tag"]="tag_rare",
+	["Holographic Tag"]="tag_holo",
+  ["Foil Tag"]="tag_foil",
+	["Polychrome Tag"]="tag_polychrome",
+	["Investment Tag"]="tag_investment",
+	["Voucher Tag"]="tag_voucher",
+	["Boss Tag"]="tag_boss",
+	["Charm Tag"]="tag_charm",
+	["Juggle Tag"]="tag_juggle",
+	["Double Tag"]="tag_double",
+	["Coupon Tag"]="tag_coupon",
+	["Economy Tag"]="tag_economy",
+	["Skip Tag"]="tag_skip",
+	["D6 Tag"]="tag_d_six",
 }
+
+local searchTagKeys = {}
+for key in pairs(Brainstorm.SearchTagList) do
+	table.insert(searchTagKeys, key)
+end
+-- print(Brainstorm.FUNCS.inspect(searchTagKeys))
 
 Brainstorm.G_FUNCS_options_ref = G.FUNCS.options
 G.FUNCS.options = function(e)
 	Brainstorm.G_FUNCS_options_ref(e)
-	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
 local ct = create_tabs
 function create_tabs(args)
@@ -37,6 +45,14 @@ function create_tabs(args)
 						colour = G.C.CLEAR,
 					},
 					nodes = {
+            create_toggle({
+							label = "Deck View: Hide Played Cards",
+							ref_table = Brainstorm.SETTINGS,
+							ref_value = "hide_played",
+							callback = function(_set_toggle)
+                nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
+							end,
+						}),
 						create_toggle({
 							label = "Debug Mode",
 							ref_table = Brainstorm.SETTINGS,
@@ -50,12 +66,12 @@ function create_tabs(args)
 							label = "AutoReroll Search Tag",
 							scale = 0.8,
 							w = 4,
-							options = Brainstorm.SearchTagList,
+							options = searchTagKeys,
 							opt_callback = "change_search_tag",
 							current_option = Brainstorm.SETTINGS.autoreroll.searchTagID,
 						}),
 						create_toggle({
-							label = "Search For Soul",
+							label = "Charm Tag: Soul Skip",
 							ref_table = Brainstorm.SETTINGS.autoreroll,
 							ref_value = "searchForSoul",
 						}),
@@ -156,16 +172,26 @@ function G.UIDEF.view_deck(unplayed_only)
 					then
 						greyed = true
 					end
-					if not greyed then
-						card_count = card_count + 1
-						local copy = copy_card(SUITS[suit_map[j]][i], nil, _scale)
-						copy.greyed = greyed
-						copy.T.x = view_deck.T.x + view_deck.T.w / 2
-						copy.T.y = view_deck.T.y
+            if not greyed and Brainstorm.SETTINGS.hide_played then
+              card_count = card_count + 1
+              local copy = copy_card(SUITS[suit_map[j]][i], nil, _scale)
+              copy.greyed = greyed
+              copy.T.x = view_deck.T.x + view_deck.T.w / 2
+              copy.T.y = view_deck.T.y
 
-						copy:hard_set_T()
-						view_deck:emplace(copy)
-					end
+              copy:hard_set_T()
+              view_deck:emplace(copy)
+            else if not Brainstorm.SETTINGS.hide_played then
+              card_count = card_count + 1
+              local copy = copy_card(SUITS[suit_map[j]][i], nil, _scale)
+              copy.greyed = greyed
+              copy.T.x = view_deck.T.x + view_deck.T.w / 2
+              copy.T.y = view_deck.T.y
+
+              copy:hard_set_T()
+              view_deck:emplace(copy)
+            end
+          end
 				end
 			end
 			view_deck.config.card_limit = card_count

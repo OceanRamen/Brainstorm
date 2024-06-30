@@ -12,4 +12,7 @@ function initBrainstorm()
 			Brainstorm.SETTINGS = settings_file
 		end
 	end
+  _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
 end
+
+
