@@ -5,13 +5,25 @@ Brainstorm.VER = "Brainstorm v1.1.0-alpha"
 
 function Brainstorm.update(dt)
 	if Brainstorm.AUTOREROLL.autoRerollActive then
+		Brainstorm.AUTOREROLL.autoRerollFrames = (Brainstorm.AUTOREROLL.autoRerollFrames or 0)
 		Brainstorm.AUTOREROLL.rerollTimer = Brainstorm.AUTOREROLL.rerollTimer + dt
 		if Brainstorm.AUTOREROLL.rerollTimer >= Brainstorm.AUTOREROLL.rerollInterval then
 			Brainstorm.AUTOREROLL.rerollTimer = Brainstorm.AUTOREROLL.rerollTimer - Brainstorm.AUTOREROLL.rerollInterval
 			seed_found = Brainstorm.auto_reroll()
 			if seed_found then
 				Brainstorm.AUTOREROLL.autoRerollActive = false
+				Brainstorm.AUTOREROLL.autoRerollFrames = 0
+				if Brainstorm.AUTOREROLL.rerollText then
+					Brainstorm.remove_attention_text(Brainstorm.AUTOREROLL.rerollText)
+					Brainstorm.AUTOREROLL.rerollText = nil
+				end
 			end
+		end
+		Brainstorm.AUTOREROLL.autoRerollFrames = Brainstorm.AUTOREROLL.autoRerollFrames + 1
+		if Brainstorm.AUTOREROLL.autoRerollFrames == 20 then
+			Brainstorm.AUTOREROLL.rerollText = Brainstorm.attention_text({
+				scale = 1.4, text = "Rerolling...", align = 'cm', offset = {x = 0,y = -3.5},major = G.STAGE == G.STAGES.RUN and G.play or G.title_top
+			})
 		end
 	end
 end

@@ -1,1 +1,1 @@
-return {["hide_played"]=true,["autoreroll"]={["searchForSoul"]=false,["searchTagID"]=13,["searchTag"]="tag_charm",},["keybinds"]={["loadState"]="x",["saveState"]="z",["autoReroll"]="a",["rerollSeed"]="t",},["debug_mode"]=false,}
+return {["hide_played"]=true,["autoreroll"]={["searchForSoul"]=2,["searchTag"]="tag_charm",["searchTagID"]=2,["searchPackID"]=21,["searchPack"]={[1]="p_spectral_mega_1",},},["keybinds"]={["loadState"]="x",["saveState"]="z",["autoReroll"]="a",["rerollSeed"]="t",},["debug_mode"]=false,}
