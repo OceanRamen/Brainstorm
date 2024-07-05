@@ -4,6 +4,7 @@ local nativefs = require("nativefs")
 
 
 Brainstorm.SearchTagList = {
+	["None"]="",
 	["Uncommon Tag"]="tag_uncommon",
 	["Rare Tag"]="tag_rare",
 	["Holographic Tag"]="tag_holo",
@@ -21,10 +22,32 @@ Brainstorm.SearchTagList = {
 	["D6 Tag"]="tag_d_six",
 }
 
-local searchTagKeys = {}
-for key in pairs(Brainstorm.SearchTagList) do
-	table.insert(searchTagKeys, key)
-end
+Brainstorm.SearchPackList = {
+	["None"] = {},
+	["Arcana"] = {"p_arcana_normal_1","p_arcana_normal_2","p_arcana_normal_3","p_arcana_normal_4","p_arcana_jumbo_1","p_arcana_jumbo_2","p_arcana_mega_1", "p_arcana_mega_2"},
+	["Celestial"] = {"p_celestial_normal_1","p_celestial_normal_2","p_celestial_normal_3","p_celestial_normal_4","p_celestial_jumbo_1","p_celestial_jumbo_2","p_celestial_mega_1", "p_celestial_mega_2"},
+	["Standard"] = {"p_standard_normal_1","p_standard_normal_2","p_standard_normal_3","p_standard_normal_4","p_standard_jumbo_1","p_standard_jumbo_2","p_standard_mega_1", "p_standard_mega_2"},
+	["Buffoon"] = {"p_buffoon_normal_1","p_buffoon_normal_2","p_buffoon_jumbo_1","p_buffoon_mega_1"},
+	["Spectral"] = {"p_spectral_normal_1","p_spectral_normal_2","p_spectral_jumbo_1","p_spectral_mega_1"},
+	["Normal Arcana"] = {"p_arcana_normal_1","p_arcana_normal_2","p_arcana_normal_3","p_arcana_normal_4"},
+	["Jumbo Arcana"] = {"p_arcana_jumbo_1","p_arcana_jumbo_2"},
+	["Mega Arcana"] = {"p_arcana_mega_1", "p_arcana_mega_2"},
+	["Normal Celestial"] = {"p_celestial_normal_1","p_celestial_normal_2","p_celestial_normal_3","p_celestial_normal_4"},
+	["Jumbo Celestial"] = {"p_celestial_jumbo_1","p_celestial_jumbo_2"},
+	["Mega Celestial"] = {"p_celestial_mega_1", "p_celestial_mega_2"},
+	["Normal Standard"] = {"p_standard_normal_1","p_standard_normal_2","p_standard_normal_3","p_standard_normal_4"},
+	["Jumbo Standard"] = {"p_standard_jumbo_1","p_standard_jumbo_2"},
+	["Mega Standard"] = {"p_standard_mega_1", "p_standard_mega_2"},
+	["Normal Buffoon"] = {"p_buffoon_normal_1","p_buffoon_normal_2"},
+	["Jumbo Buffoon"] = {"p_buffoon_jumbo_1"},
+	["Mega Buffoon"] = {"p_buffoon_mega_1"},
+	["Normal Spectral"] = {"p_spectral_normal_1","p_spectral_normal_2"},
+	["Jumbo Spectral"] = {"p_spectral_jumbo_1"},
+	["Mega Spectral"] = {"p_spectral_mega_1"},
+}
+
+local searchTagKeys = {"None", "Charm Tag", "Double Tag", "Uncommon Tag", "Rare Tag", "Holographic Tag", "Foil Tag", "Polychrome Tag", "Investment Tag", "Voucher Tag", "Boss Tag", "Juggle Tag", "Coupon Tag", "Economy Tag", "Skip Tag", "D6 Tag"}
+local searchPackKeys = {"None", "Arcana", "Celestial", "Standard", "Buffoon", "Spectral", "Normal Arcana", "Jumbo Arcana", "Mega Arcana", "Normal Celestial", "Jumbo Celestial", "Mega Celestial", "Normal Standard", "Jumbo Standard", "Mega Standard", "Normal Buffoon", "Jumbo Buffoon", "Mega Buffoon", "Normal Spectral", "Jumbo Spectral", "Mega Spectral"}
 -- print(Brainstorm.FUNCS.inspect(searchTagKeys))
 
 Brainstorm.G_FUNCS_options_ref = G.FUNCS.options
@@ -68,12 +91,23 @@ function create_tabs(args)
 							w = 4,
 							options = searchTagKeys,
 							opt_callback = "change_search_tag",
-							current_option = Brainstorm.SETTINGS.autoreroll.searchTagID,
+							current_option = Brainstorm.SETTINGS.autoreroll.searchTagID or 1,
 						}),
-						create_toggle({
-							label = "Charm Tag: Soul Skip",
-							ref_table = Brainstorm.SETTINGS.autoreroll,
-							ref_value = "searchForSoul",
+						create_option_cycle({
+							label = "AutoReroll Search Pack",
+							scale = 0.8,
+							w = 4,
+							options = searchPackKeys,
+							opt_callback = "change_search_pack",
+							current_option = Brainstorm.SETTINGS.autoreroll.searchPackID or 1,
+						}),
+						create_option_cycle({
+							label = "Charm Tag/Arcana Pack: Number of Souls",
+							scale = 0.8,
+							w = 4,
+							options = {0,1,2},
+							opt_callback = "change_search_soul_count",
+							current_option = Brainstorm.SETTINGS.autoreroll.searchForSoul + 1 or 1,
 						}),
 					},
 				}
