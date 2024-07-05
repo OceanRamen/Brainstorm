@@ -2,7 +2,6 @@ local lovely = require("lovely")
 local nativefs = require("nativefs")
 
 Brainstorm.AUTOREROLL = {}
-Brainstorm.AUTOREROLL.rerollsPerFrame = 500
 
 G.FUNCS.change_search_tag = function(x)
 	Brainstorm.SETTINGS.autoreroll.searchTagID = x.to_key
@@ -17,9 +16,15 @@ G.FUNCS.change_search_pack = function(x)
 end
 
 G.FUNCS.change_search_soul_count = function(x)
-	  Brainstorm.SETTINGS.autoreroll.searchForSoul = x.to_val
-	  nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
-  end
+	Brainstorm.SETTINGS.autoreroll.searchForSoul = x.to_val
+	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
+end
+
+G.FUNCS.change_seeds_per_frame = function(x)
+	Brainstorm.SETTINGS.autoreroll.seedsPerFrameID = x.to_key
+	Brainstorm.SETTINGS.autoreroll.seedsPerFrame = Brainstorm.seedsPerFrame[x.to_val]
+	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
+end
 
 Brainstorm.AUTOREROLL.autoRerollActive = false
 Brainstorm.AUTOREROLL.rerollInterval = 0.01 -- Time interval between rerolls (in seconds)
@@ -50,7 +55,7 @@ function Brainstorm.auto_reroll()
 	-- This part is meant to mimic how Balatro rerolls for Gold Stake
 	local extra_num = -0.561892350821
 	local seed_found = nil
-	while not seed_found and rerollsThisFrame < Brainstorm.AUTOREROLL.rerollsPerFrame do
+	while not seed_found and rerollsThisFrame < Brainstorm.SETTINGS.autoreroll.seedsPerFrame do
 		rerollsThisFrame = rerollsThisFrame + 1
 		extra_num = extra_num + 0.561892350821
 		seed_found = random_string(
@@ -92,7 +97,8 @@ function Brainstorm.auto_reroll()
 			local poll = pseudorandom(Brainstorm.pseudoseed("shop_pack1"..seed_found))*cume
 			for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
 				if not _type or _type == v.kind then it = it + (v.weight or 1) end
-				if it >= poll and it - (v.weight or 1) <= poll then center = v; break end
+				if it >= poll and it - (v.weight or 1) <= poll then center = v
+break end
 			end
 			local pack_found = false
 			for i = 1, #Brainstorm.SETTINGS.autoreroll.searchPack do

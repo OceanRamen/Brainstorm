@@ -45,9 +45,15 @@ Brainstorm.SearchPackList = {
 	["Jumbo Spectral"] = {"p_spectral_jumbo_1"},
 	["Mega Spectral"] = {"p_spectral_mega_1"},
 }
+Brainstorm.seedsPerFrame = {
+    ["500"] = 500,
+    ["750"] = 750,
+    ["1000"] = 1000,
+}
 
 local searchTagKeys = {"None", "Charm Tag", "Double Tag", "Uncommon Tag", "Rare Tag", "Holographic Tag", "Foil Tag", "Polychrome Tag", "Investment Tag", "Voucher Tag", "Boss Tag", "Juggle Tag", "Coupon Tag", "Economy Tag", "Skip Tag", "D6 Tag"}
 local searchPackKeys = {"None", "Arcana", "Celestial", "Standard", "Buffoon", "Spectral", "Normal Arcana", "Jumbo Arcana", "Mega Arcana", "Normal Celestial", "Jumbo Celestial", "Mega Celestial", "Normal Standard", "Jumbo Standard", "Mega Standard", "Normal Buffoon", "Jumbo Buffoon", "Mega Buffoon", "Normal Spectral", "Jumbo Spectral", "Mega Spectral"}
+local seedsPerFrame = {"500", "750", "1000"}
 -- print(Brainstorm.FUNCS.inspect(searchTagKeys))
 
 Brainstorm.G_FUNCS_options_ref = G.FUNCS.options
@@ -108,6 +114,14 @@ function create_tabs(args)
 							options = {0,1,2},
 							opt_callback = "change_search_soul_count",
 							current_option = Brainstorm.SETTINGS.autoreroll.searchForSoul + 1 or 1,
+						}),
+                        create_option_cycle({
+							label = "Rerolls per Frame",
+							scale = 0.8,
+							w = 4,
+							options = seedsPerFrame,
+							opt_callback = "change_seeds_per_frame",
+							current_option = Brainstorm.SETTINGS.autoreroll.seedsPerFrameID or 1,
 						}),
 					},
 				}

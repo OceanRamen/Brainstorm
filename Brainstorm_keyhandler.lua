@@ -2,7 +2,6 @@ local lovely = require("lovely")
 local nativefs = require("nativefs")
 
 Brainstorm.AUTOREROLL = {}
-Brainstorm.AUTOREROLL.perFrame = 1000
 
 local saveKeys = { "1", "2", "3", "4", "5" }
 
