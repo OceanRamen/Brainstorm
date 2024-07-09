@@ -24,6 +24,15 @@ payload = "initBrainstorm()"
 match_indent = true
 overwrite = false
 
+[[patches]] # Inject key press handler
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = "if self.text_input_hook then"
+position = "before"
+payload = "Brainstorm.key_press_update(key)"
+match_indent = true
+overwrite = false
+
 #   Add aditional gamespeeds to settings
 [[patches]] #   Additional GameSpeed Options
 [patches.pattern]
