@@ -1,0 +1,7 @@
+--- STEAMODDED HEADER
+--- MOD_NAME: Brainstorm
+--- MOD_ID: Brainstorm
+--- PREFIX: brainstorm
+--- MOD_AUTHOR: [OceanRamen]
+--- MOD_DESCRIPTION: The Balatro Reroll Mod.
+--- VERSION: 2.0.0-beta
