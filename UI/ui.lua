@@ -20,6 +20,25 @@ local tag_list = {
   ["D6 Tag"] = "tag_d_six",
 }
 
+local voucher_list = {
+  ["None"] = "",
+  ["Overstock"] = "v_overstock_norm",
+  ["Clearance Sale"] = "v_clearance_sale",
+  ["Hone"] = "v_hone",
+  ["Reroll Surplus"] = "v_reroll_surplus",
+  ["Crystal Ball"] = "v_crystal_ball",
+  ["Telescope"] = "v_telescope",
+  ["Grabber"] = "v_grabber",
+  ["Wasteful"] = "v_wasteful",
+  ["Tarot Merchant"] = "v_tarot_merchant",
+  ["Planet Merchant"] = "v_planet_merchant",
+  ["Seed Money"] = "v_seed_money",
+  ["Blank"] = "v_blank",
+  ["Magic Trick"] = "v_magic_trick",
+  ["Hieroglyph"] = "v_hieroglyph",
+  ["Director's Cut"] = "v_directors_cut",
+  ["Paint Brush"] = "v_paint_brush",
+}
 local pack_list = {
   ["None"] = {},
   ["Normal Arcana"] = {
@@ -61,6 +80,26 @@ local spf_list = {
 
 local spf_keys = { "500", "750", "1000" }
 
+local voucher_keys = {
+  "None",
+  "Overstock",
+  "Clearance Sale",
+  "Hone",
+  "Reroll Surplus",
+  "Crystal Ball",
+  "Telescope",
+  "Grabber",
+  "Wasteful",
+  "Tarot Merchant",
+  "Planet Merchant",
+  "Seed Money",
+  "Blank",
+  "Magic Trick",
+  "Hieroglyph",
+  "Director's Cut",
+  "Paint Brush",
+}
+
 local tag_keys = {
   "None",
   "Charm Tag",
@@ -79,6 +118,7 @@ local tag_keys = {
   "Skip Tag",
   "D6 Tag",
 }
+
 local pack_keys = {
   "None",
   "Normal Arcana",
@@ -97,6 +137,12 @@ local pack_keys = {
   "Jumbo Spectral",
   "Mega Spectral",
 }
+
+G.FUNCS.change_target_voucher = function(x)
+  Brainstorm.config.ar_filters.voucher_id = x.to_key
+  Brainstorm.config.ar_filters.voucher_name = voucher_list[x.to_val]
+  Brainstorm.writeConfig()
+end
 
 G.FUNCS.change_target_pack = function(x)
   Brainstorm.config.ar_filters.pack_id = x.to_key
@@ -142,15 +188,23 @@ function create_tabs(args)
           nodes = {
             create_option_cycle({
               label = "AR TAG SEARCH",
-              scale = 0.8,
+              scale = 0.6,
               w = 4,
               options = tag_keys,
               opt_callback = "change_target_tag",
               current_option = Brainstorm.config.ar_filters.tag_id or 1,
             }),
             create_option_cycle({
+              label = "AR VOUCHER SEARCH",
+              scale = 0.6,
+              w = 4,
+              options = voucher_keys,
+              opt_callback = "change_target_voucher",
+              current_option = Brainstorm.config.ar_filters.voucher_id or 1,
+            }),
+            create_option_cycle({
               label = "AR PACK SEARCH",
-              scale = 0.8,
+              scale = 0.6,
               w = 4,
               options = pack_keys,
               opt_callback = "change_target_pack",
@@ -158,7 +212,7 @@ function create_tabs(args)
             }),
             create_option_cycle({
               label = "AR N. SOULS",
-              scale = 0.8,
+              scale = 0.6,
               w = 4,
               options = { 0, 1 },
               opt_callback = "change_soul_count",
@@ -166,7 +220,7 @@ function create_tabs(args)
             }),
             create_option_cycle({
               label = "Rerolls per Frame",
-              scale = 0.8,
+              scale = 0.6,
               w = 4,
               options = spf_keys,
               opt_callback = "change_spf",

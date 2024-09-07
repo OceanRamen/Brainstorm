@@ -19,6 +19,8 @@ Brainstorm.config = {
   ar_filters = {
     pack = {},
     pack_id = 1,
+    voucher_name = "",
+    voucher_id = 1,
     tag_name = "tag_charm",
     tag_id = 2,
     soul_skip = 1,
@@ -155,7 +157,7 @@ function Brainstorm.autoReroll()
   local ffi = require("ffi")
   local lovely = require("lovely")
   ffi.cdef([[
-	const char* brainstorm(const char* seed, const char* pack, const char* tag, double souls);
+	const char* brainstorm(const char* seed, const char* voucher, const char* pack, const char* tag, double souls);
     ]])
   local immolate = ffi.load(Brainstorm.PATH .. "/Immolate.dll")
   local pack
@@ -170,9 +172,16 @@ function Brainstorm.autoReroll()
     set = "Tag",
     key = Brainstorm.config.ar_filters.tag_name,
   })
+  local voucher_name = localize({
+    type = "name_text",
+    set = "Voucher",
+    key = Brainstorm.config.ar_filters.voucher_name,
+  })
+  print(pack_name, tag_name, voucher_name)
   seed_found = ffi.string(
     immolate.brainstorm(
       seed_found,
+      voucher_name,
       pack_name,
       tag_name,
       Brainstorm.config.ar_filters.soul_skip
