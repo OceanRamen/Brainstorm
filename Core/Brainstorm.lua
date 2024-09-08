@@ -199,9 +199,31 @@ function Brainstorm.autoReroll()
       seed = seed_found,
       challenge = G.GAME and G.GAME.challenge and G.GAME.challenge_tab,
     })
+    G.GAME.used_filter = true
+    G.GAME.filter_info = {
+      filter_params = {
+        seed_found,
+        voucher_name,
+        pack_name,
+        tag_name,
+        Brainstorm.config.ar_filters.soul_skip,
+        Brainstorm.config.ar_filters.inst_observatory,
+        Brainstorm.config.ar_filters.inst_perkeo,
+      },
+    }
     G.GAME.seeded = false
   end
   return seed_found
+end
+
+local cursr = create_UIBox_round_scores_row
+function create_UIBox_round_scores_row(score, text_colour)
+  local ret = cursr(score, text_colour)
+  ret.nodes[2].nodes[1].config.colour = (score == "seed" and G.GAME.seeded)
+      and G.C.RED
+    or (score == "seed" and G.GAME.used_filter) and G.C.BLUE
+    or G.C.BLACK
+  return ret
 end
 
 -- TODO: Rework attention text.
