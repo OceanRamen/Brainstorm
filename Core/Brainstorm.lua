@@ -24,6 +24,8 @@ Brainstorm.config = {
     tag_name = "tag_charm",
     tag_id = 2,
     soul_skip = 1,
+    inst_observatory = false,
+    inst_perkeo = false,
   },
   ar_prefs = {
     spf_id = 3,
@@ -157,7 +159,7 @@ function Brainstorm.autoReroll()
   local ffi = require("ffi")
   local lovely = require("lovely")
   ffi.cdef([[
-	const char* brainstorm(const char* seed, const char* voucher, const char* pack, const char* tag, double souls);
+	const char* brainstorm(const char* seed, const char* voucher, const char* pack, const char* tag, double souls, bool observatory, bool perkeo);
     ]])
   local immolate = ffi.load(Brainstorm.PATH .. "/Immolate.dll")
   local pack
@@ -184,7 +186,9 @@ function Brainstorm.autoReroll()
       voucher_name,
       pack_name,
       tag_name,
-      Brainstorm.config.ar_filters.soul_skip
+      Brainstorm.config.ar_filters.soul_skip,
+      Brainstorm.config.ar_filters.inst_observatory,
+      Brainstorm.config.ar_filters.inst_perkeo
     )
   )
   if seed_found then
