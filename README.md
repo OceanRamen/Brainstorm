@@ -30,7 +30,7 @@ Each number from 0 - 5 corresponds to a save slot. To overwrite an old save, sim
 
 ### Fast Rerolling
 Brainstorm allows for super-fast rerolling through the use of an in-game key bind. 
-> To fast-roll:	Press `Ctrl + t`
+> To fast-roll:	Press `Ctrl + r`
 
 ### Auto-Rerolling
 Brainstorm can automatically reroll for parameters as specified by the user.
