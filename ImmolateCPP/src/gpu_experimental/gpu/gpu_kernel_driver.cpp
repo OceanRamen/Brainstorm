@@ -8,7 +8,7 @@
 
 #include "cuda_driver_loader.h"
 #include "gpu_types.h"
-#include "../seed.hpp"
+#include "seed.hpp"
 #include <chrono>
 #include <cstdio>
 #include <cstring>

@@ -15,6 +15,7 @@ echo "========================================"
 
 ERRORS=0
 WARNINGS=0
+VALIDATE_GPU=${VALIDATE_GPU:-0}
 
 # Check if DLL exists
 echo -e "\n[1/7] Checking DLL..."
@@ -30,6 +31,18 @@ if [ -f "Immolate.dll" ]; then
 else
     echo -e "${RED}✗${NC} DLL not found! Build it first."
     ERRORS=$((ERRORS + 1))
+fi
+
+if [ "$VALIDATE_GPU" = "1" ]; then
+    echo -e "\n[1b/7] Checking GPU DLL (experimental)..."
+    if [ -f "ImmolateCUDA.dll" ]; then
+        CUDA_SIZE=$(stat -c%s "ImmolateCUDA.dll" 2>/dev/null || stat -f%z "ImmolateCUDA.dll" 2>/dev/null || echo 0)
+        CUDA_MB=$(echo "scale=2; $CUDA_SIZE/1048576" | bc)
+        echo -e "${GREEN}✓${NC} GPU DLL found (${CUDA_MB} MB)"
+    else
+        echo -e "${YELLOW}⚠${NC} ImmolateCUDA.dll not found (GPU checks skipped)"
+        WARNINGS=$((WARNINGS + 1))
+    fi
 fi
 
 # Run Lua syntax checks
@@ -150,7 +163,8 @@ else
     
     # Suggest fixes
     echo -e "\nSuggested fixes:"
-    echo "1. Rebuild DLL: cd ImmolateCPP && ./build_driver.sh"
+    echo "1. Rebuild CPU DLL: cd ImmolateCPP && ./build_cpu.sh"
+    echo "   (Optional GPU rebuild: ./build_gpu.sh)"
     echo "2. Format code: stylua ."
     echo "3. Check logs: tail -20 gpu_driver.log"
     echo "4. Run tests: lua basic_test.lua"

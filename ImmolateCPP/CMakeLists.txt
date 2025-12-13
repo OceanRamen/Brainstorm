@@ -35,13 +35,12 @@ include_directories(src)
 
 # Source files
 set(CORE_SOURCES
-    src/brainstorm.cpp
+    src/brainstorm_cpu.cpp
     src/items.cpp
     src/rng.cpp
     src/seed.cpp
     src/util.cpp
     src/functions.cpp
-    src/search.cpp
 )
 
 # Test executable

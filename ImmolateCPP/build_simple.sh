@@ -10,13 +10,13 @@ if ! command -v x86_64-w64-mingw32-g++ &> /dev/null; then
     sudo apt-get install -y mingw-w64
 fi
 
-echo "Compiling DLL..."
+echo "Compiling CPU-only DLL..."
 
 # Single command compilation
 x86_64-w64-mingw32-g++ -shared -O2 -std=c++17 \
     -DBUILDING_DLL \
-    -o ../Immolate_new.dll \
-    src/brainstorm.cpp \
+    -o ../Immolate.dll \
+    src/brainstorm_cpu.cpp \
     src/items.cpp \
     src/rng.cpp \
     src/seed.cpp \
@@ -27,7 +27,7 @@ x86_64-w64-mingw32-g++ -shared -O2 -std=c++17 \
     -Wl,--export-all-symbols
 
 if [ $? -eq 0 ]; then
-    echo "Success! Created Immolate_new.dll"
+    echo "Success! Created Immolate.dll"
 else
     echo "Compilation failed"
 fi

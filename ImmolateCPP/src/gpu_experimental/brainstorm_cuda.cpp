@@ -236,7 +236,7 @@ static void initialize_gpu() {
 }
 
 // CPU implementation - existing filter logic
-long filter_cpu(Instance inst) {
+int filter_cpu(Instance& inst) {
     // Check tags first (cheapest operation)
     if (BRAINSTORM_TAG1 != Item::RETRY || BRAINSTORM_TAG2 != Item::RETRY) {
         Item smallBlindTag = inst.nextTag(1);

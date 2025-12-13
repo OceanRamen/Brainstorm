@@ -29,18 +29,34 @@ mkdir -p "$TARGET"
 mkdir -p "$TARGET/Core"
 mkdir -p "$TARGET/UI"
 
-# Check and deploy DLL
-echo -e "\n${YELLOW}Deploying DLL...${NC}"
+DEPLOY_GPU=${DEPLOY_GPU:-0}
+
+# Deploy CPU DLL (default)
+echo -e "\n${YELLOW}Deploying CPU DLL...${NC}"
 if [ -f "Immolate.dll" ]; then
     DLL_SIZE=$(du -h "Immolate.dll" | cut -f1)
-    cp "Immolate.dll" "$TARGET/Immolate.dll"
-    
-    # Check DLL size to determine if GPU support is included
-    # Always deploy GPU files if they exist (regardless of size)
-    if [ -f "seed_filter.ptx" ] || [ -f "gpu_worker.exe" ]; then
-        echo -e "${GREEN}✓${NC} Deployed enhanced DLL with GPU support (${DLL_SIZE})"
-        
-        # Also deploy PTX files if they exist
+    if cp "Immolate.dll" "$TARGET/Immolate.dll"; then
+        echo -e "${GREEN}✓${NC} Deployed CPU DLL (${DLL_SIZE})"
+    else
+        echo -e "${RED}✗${NC} Failed to copy CPU DLL (permission denied?)"
+        echo "Ensure WSL can write to $TARGET (may require elevated shell or mount options)."
+        exit 1
+    fi
+else
+    echo -e "${RED}✗${NC} Error: Immolate.dll not found!"
+    echo "Build it with: cd ImmolateCPP && ./build_cpu.sh"
+    echo "Or fallback: cd ImmolateCPP && ./build_simple.sh"
+    exit 1
+fi
+
+# Optional: deploy experimental GPU build when requested
+if [ "$DEPLOY_GPU" = "1" ]; then
+    echo -e "\n${YELLOW}Deploying experimental GPU DLL...${NC}"
+    if [ -f "ImmolateCUDA.dll" ]; then
+        CUDA_SIZE=$(du -h "ImmolateCUDA.dll" | cut -f1)
+        cp "ImmolateCUDA.dll" "$TARGET/ImmolateCUDA.dll"
+        echo -e "${GREEN}✓${NC} Deployed GPU DLL (${CUDA_SIZE})"
+
         if [ -f "seed_filter.ptx" ]; then
             cp "seed_filter.ptx" "$TARGET/seed_filter.ptx"
             echo -e "${GREEN}✓${NC} Deployed CUDA kernel (PTX)"
@@ -49,20 +65,18 @@ if [ -f "Immolate.dll" ]; then
             cp "seed_filter.fatbin" "$TARGET/seed_filter.fatbin"
             echo -e "${GREEN}✓${NC} Deployed CUDA kernel (fatbin)"
         fi
-        
-        # Deploy GPU worker process if it exists
         if [ -f "gpu_worker.exe" ]; then
             cp "gpu_worker.exe" "$TARGET/gpu_worker.exe"
             echo -e "${GREEN}✓${NC} Deployed GPU worker process"
         fi
     else
-        echo -e "${GREEN}✓${NC} Deployed CPU-only DLL (${DLL_SIZE})"
+        echo -e "${YELLOW}⚠${NC} Skipping GPU deploy: ImmolateCUDA.dll not found"
+        echo "Build with: cd ImmolateCPP && ./build_gpu.sh"
     fi
 else
-    echo -e "${RED}✗${NC} Error: Immolate.dll not found!"
-    echo "Build it with: cd ImmolateCPP && ./build_simple.sh"
-    echo "Or for GPU: cd ImmolateCPP && ./build_gpu.sh"
-    exit 1
+    if [ -f "ImmolateCUDA.dll" ]; then
+        echo -e "${YELLOW}ℹ${NC} GPU build present but not deployed (set DEPLOY_GPU=1 to include)"
+    fi
 fi
 
 # Core mod files
@@ -83,8 +97,13 @@ for file in "${CORE_FILES[@]}"; do
         if [ "$dir" != "." ]; then
             mkdir -p "$TARGET/$dir"
         fi
-        cp "$file" "$TARGET/$file"
-        echo -e "${GREEN}✓${NC} Deployed: $file"
+        if cp "$file" "$TARGET/$file"; then
+            echo -e "${GREEN}✓${NC} Deployed: $file"
+        else
+            echo -e "${RED}✗${NC} Failed to copy $file (permission denied?)"
+            echo "Ensure WSL can write to $TARGET."
+            exit 1
+        fi
     else
         echo -e "${RED}✗${NC} Missing required file: $file"
         exit 1
@@ -100,8 +119,11 @@ DOC_FILES=(
 
 for file in "${DOC_FILES[@]}"; do
     if [ -f "$file" ]; then
-        cp "$file" "$TARGET/$file"
-        echo -e "${GREEN}✓${NC} Deployed: $file"
+        if cp "$file" "$TARGET/$file"; then
+            echo -e "${GREEN}✓${NC} Deployed: $file"
+        else
+            echo -e "${YELLOW}⚠${NC} Could not copy $file (permission denied?)"
+        fi
     else
         echo -e "${YELLOW}⚠${NC} Documentation missing: $file"
     fi
@@ -154,11 +176,11 @@ if [ -f "$TARGET/config.lua" ]; then
         echo -e "${GREEN}✓${NC} Debug mode is disabled (production mode)"
     fi
     
-    # Check if CUDA is enabled
-    if grep -q "use_cuda.*true" "$TARGET/config.lua"; then
-        echo -e "${YELLOW}ℹ${NC} GPU/CUDA is ENABLED (will attempt to use GPU acceleration)"
+    # Check if experimental GPU is enabled
+    if grep -q "use_gpu_experimental.*true" "$TARGET/config.lua"; then
+        echo -e "${YELLOW}ℹ${NC} Experimental GPU is ENABLED (ImmolateCUDA.dll expected)"
     else
-        echo -e "${YELLOW}ℹ${NC} GPU/CUDA is disabled (CPU-only mode)"
+        echo -e "${YELLOW}ℹ${NC} Experimental GPU is disabled (CPU-only mode)"
     fi
 fi
 

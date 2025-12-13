@@ -1,11 +1,11 @@
 // GPU Searcher implementation with actual CUDA kernel support
 // This file provides the bridge between C++ and CUDA kernels
 
-#include "../functions.hpp"
-#include "../instance.hpp"
-#include "../rng.hpp"
-#include "../seed.hpp"
-#include "../util.hpp"
+#include "functions.hpp"
+#include "instance.hpp"
+#include "rng.hpp"
+#include "seed.hpp"
+#include "util.hpp"
 #include "cuda_wrapper.hpp"
 #include "gpu_searcher.hpp"
 #include <chrono>

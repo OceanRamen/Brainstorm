@@ -46,6 +46,7 @@ Brainstorm.SMODS = nil
 
 Brainstorm.config = {
   enable = true,
+  use_gpu_experimental = false, -- default to CPU-only; GPU is opt-in
   keybind_autoreroll = "r",
   keybinds = {
     options = "t",
@@ -212,6 +213,8 @@ function Brainstorm.load_config()
       -- Map suit ratio percentage to decimal value (use static table)
       Brainstorm.config.ar_prefs.suit_ratio_decimal = Brainstorm.RATIO_MAP[Brainstorm.config.ar_prefs.suit_ratio_percent]
         or 0
+      Brainstorm.config.use_gpu_experimental = Brainstorm.config.use_gpu_experimental
+        or false
     end
   end
 end
@@ -1023,7 +1026,7 @@ end
 -- Foreign Function Interface (FFI) for native DLL integration
 -- The DLL provides high-performance seed filtering without game restarts
 local ffi_loaded = false
-local immolate_dll = nil -- Cache the DLL handle to avoid repeated loading
+local native_handles = { cpu = nil, gpu = nil }
 
 -- Initialize FFI definitions for DLL functions
 local function init_ffi()
@@ -1050,6 +1053,82 @@ local function init_ffi()
     ffi_loaded = true
   end
   return true
+end
+
+local function load_cpu_native()
+  if native_handles.cpu then
+    return native_handles.cpu
+  end
+
+  local dll_path = Brainstorm.PATH .. "/Immolate.dll"
+  local dll_file = io.open(dll_path, "rb")
+  if not dll_file then
+    if Brainstorm.debug.enabled then
+      log:error("CPU DLL not found", { path = dll_path })
+    end
+    return nil
+  end
+  dll_file:close()
+
+  local success, handle = pcall(ffi.load, dll_path)
+  if not success then
+    if Brainstorm.debug.enabled then
+      log:error("Failed to load CPU DLL", { error = tostring(handle) })
+    end
+    return nil
+  end
+
+  native_handles.cpu = handle
+  if Brainstorm.debug.enabled then
+    log:info("Loaded CPU DLL", { path = dll_path })
+  end
+  return handle
+end
+
+local function load_gpu_native()
+  if not Brainstorm.config.use_gpu_experimental then
+    return nil
+  end
+
+  if native_handles.gpu then
+    return native_handles.gpu
+  end
+
+  local dll_path = Brainstorm.PATH .. "/ImmolateCUDA.dll"
+  local dll_file = io.open(dll_path, "rb")
+  if not dll_file then
+    if Brainstorm.debug.enabled then
+      log:warn("GPU DLL not found (skipping)", { path = dll_path })
+    end
+    return nil
+  end
+  dll_file:close()
+
+  local success, handle = pcall(ffi.load, dll_path)
+  if not success then
+    if Brainstorm.debug.enabled then
+      log:error("Failed to load GPU DLL", { error = tostring(handle) })
+    end
+    return nil
+  end
+
+  native_handles.gpu = handle
+  if Brainstorm.debug.enabled then
+    log:info("Loaded GPU DLL (experimental)", { path = dll_path })
+  end
+
+  -- Log hardware info when available
+  if handle.get_hardware_info then
+    local info_ptr = handle.get_hardware_info()
+    if info_ptr then
+      local hardware_info = ffi.string(info_ptr)
+      if Brainstorm.debug.enabled then
+        log:info("GPU hardware info", { info = hardware_info })
+      end
+    end
+  end
+
+  return handle
 end
 
 -- Stop auto-reroll and clean up resources
@@ -1106,66 +1185,21 @@ function Brainstorm.auto_reroll()
     return nil
   end
 
-  -- Use cached DLL handle if available
-  local immolate = immolate_dll
+  local immolate = load_cpu_native()
   if not immolate then
-    local dll_path = Brainstorm.PATH .. "/Immolate.dll"
+    return nil
+  end
 
-    -- Check if DLL exists first
-    local dll_file = io.open(dll_path, "rb")
-    if not dll_file then
-      if Brainstorm.debug.enabled then
-        log:error("DLL not found", { path = dll_path })
-      end
-      return nil
+  if Brainstorm.config.use_gpu_experimental then
+    local gpu_handle = load_gpu_native()
+    if gpu_handle then
+      immolate = gpu_handle
+      Brainstorm.debug.gpu_enabled = true
+    else
+      Brainstorm.debug.gpu_enabled = false
     end
-    dll_file:close()
-
-    local success
-    success, immolate = pcall(ffi.load, dll_path)
-    if not success then
-      if Brainstorm.debug.enabled then
-        log:error("Failed to load Immolate.dll", { error = tostring(immolate) })
-      end
-      return nil
-    end
-    immolate_dll = immolate -- Cache for future use
-    if Brainstorm.debug.enabled then
-      log:info("DLL loaded successfully")
-    end
-
-    -- Configure GPU/CUDA support based on config
-    if immolate_dll.set_use_cuda then
-      local use_cuda = Brainstorm.config.use_cuda ~= false -- Default to true
-      pcall(immolate_dll.set_use_cuda, use_cuda)
-
-      -- Get hardware info for initialization
-      if immolate_dll.get_hardware_info then
-        local info_ptr = immolate_dll.get_hardware_info()
-        if info_ptr ~= nil then
-          local hardware_info = ffi.string(info_ptr)
-          if Brainstorm.debug.enabled then
-            log:info("Hardware detected", { info = hardware_info })
-          end
-
-          -- Check actual acceleration type
-          if immolate_dll.get_acceleration_type then
-            local accel_type = immolate_dll.get_acceleration_type()
-            if accel_type == 1 then
-              if Brainstorm.debug.enabled then
-                log:info("GPU acceleration enabled")
-              end
-              Brainstorm.debug.gpu_enabled = true
-            else
-              if Brainstorm.debug.enabled then
-                log:info("Using CPU acceleration")
-              end
-              Brainstorm.debug.gpu_enabled = false
-            end
-          end
-        end
-      end
-    end
+  else
+    Brainstorm.debug.gpu_enabled = false
   end
   -- Extract pack name from configuration
   local pack = ""

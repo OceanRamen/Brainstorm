@@ -4,7 +4,7 @@
 # Supports both CPU-only and GPU+CPU builds
 
 echo "======================================="
-echo "  Brainstorm GPU Build Script v1.0"
+echo "  Brainstorm GPU Build Script v1.0 (experimental)"
 echo "======================================="
 
 # Colors for output
@@ -77,14 +77,15 @@ if [ "$1" == "--cpu-only" ] || [ $CUDA_AVAILABLE -eq 0 ]; then
         -O3 \
         -std=c++17 \
         -DBUILDING_DLL \
-        -o ../Immolate.dll \
-        ../src/brainstorm.cpp \
+        -o ../ImmolateCUDA.dll \
+        ../src/gpu_experimental/brainstorm_cuda.cpp \
         ../src/items.cpp \
         ../src/rng.cpp \
         ../src/seed.cpp \
         ../src/util.cpp \
         ../src/functions.cpp \
         -I ../src/ \
+        -I ../src/gpu_experimental \
         -static-libgcc \
         -static-libstdc++ \
         -Wl,--export-all-symbols \
@@ -92,7 +93,7 @@ if [ "$1" == "--cpu-only" ] || [ $CUDA_AVAILABLE -eq 0 ]; then
     
     if [ ${PIPESTATUS[0]} -eq 0 ]; then
         echo -e "${GREEN}✓ CPU build successful${NC}"
-        DLL_SIZE=$(du -h ../Immolate.dll | cut -f1)
+        DLL_SIZE=$(du -h ../ImmolateCUDA.dll | cut -f1)
         echo -e "  DLL size: ${DLL_SIZE}"
     else
         echo -e "${RED}✗ CPU build failed. Check build_cpu.log${NC}"
@@ -113,7 +114,7 @@ else
         -ccbin gcc-13 \
         -Xcompiler -fPIC \
         -o seed_filter.o \
-        ../src/gpu/seed_filter.cu \
+        ../src/gpu_experimental/gpu/seed_filter.cu \
         2>&1 | tee build_cuda.log
     
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
@@ -129,7 +130,7 @@ else
         -arch=sm_70 \
         -ccbin gcc-13 \
         -o seed_filter.ptx \
-        ../src/gpu/seed_filter.cu \
+        ../src/gpu_experimental/gpu/seed_filter.cu \
         2>&1 | tee -a build_cuda.log
     
     # Also create a fatbin with all architectures for embedding
@@ -145,7 +146,7 @@ else
         -gencode=arch=compute_86,code=sm_86 \
         -gencode=arch=compute_89,code=sm_89 \
         -o seed_filter.fatbin \
-        ../src/gpu/seed_filter.cu \
+        ../src/gpu_experimental/gpu/seed_filter.cu \
         2>&1 | tee -a build_cuda.log
     
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
@@ -158,7 +159,7 @@ else
     # Step 2: Compile GPU searcher with dynamic loading
     echo "Step 2: Compiling GPU searcher with dynamic CUDA loading..."
     
-    INCLUDE_FLAGS="-I ../src/"
+    INCLUDE_FLAGS="-I ../src/ -I ../src/gpu_experimental"
     if [ -n "$CUDA_INC" ]; then
         INCLUDE_FLAGS="$INCLUDE_FLAGS -I $CUDA_INC"
     fi
@@ -171,7 +172,7 @@ else
         -DBRAINSTORM_DEBUG \
         $INCLUDE_FLAGS \
         -o gpu_searcher.o \
-        ../src/gpu/gpu_searcher_dynamic.cpp \
+        ../src/gpu_experimental/gpu/gpu_searcher_dynamic.cpp \
         2>&1 | tee -a build_cuda.log
     
     # Step 2b: Compile GPU kernel wrapper
@@ -184,7 +185,7 @@ else
         -DBRAINSTORM_DEBUG \
         $INCLUDE_FLAGS \
         -o gpu_kernel.o \
-        ../src/gpu/gpu_searcher_kernel.cpp \
+        ../src/gpu_experimental/gpu/gpu_searcher_kernel.cpp \
         2>&1 | tee -a build_cuda.log
     
     # Step 3: Compile unified brainstorm
@@ -199,7 +200,7 @@ else
         -DGPU_DYNAMIC_LOAD \
         $INCLUDE_FLAGS \
         -o brainstorm.o \
-        ../src/brainstorm.cpp \
+        ../src/gpu_experimental/brainstorm_cuda.cpp \
         2>&1 | tee -a build_cuda.log
     
     # Step 4: Link everything into DLL with CUDA kernel
@@ -208,7 +209,7 @@ else
     # Link with the CUDA object file for actual GPU kernel
     x86_64-w64-mingw32-g++ \
         -shared \
-        -o ../Immolate.dll \
+        -o ../ImmolateCUDA.dll \
         brainstorm.o \
         gpu_searcher.o \
         gpu_kernel.o \
@@ -225,8 +226,12 @@ else
     
     if [ ${PIPESTATUS[0]} -eq 0 ]; then
         echo -e "${GREEN}✓ GPU+CPU build successful${NC}"
-        DLL_SIZE=$(du -h ../Immolate.dll | cut -f1)
+        DLL_SIZE=$(du -h ../ImmolateCUDA.dll | cut -f1)
         echo -e "  DLL size: ${DLL_SIZE}"
+        
+        # Export PTX/fatbin alongside the DLL for packaging/deployment
+        [ -f seed_filter.ptx ] && cp seed_filter.ptx ../seed_filter.ptx
+        [ -f seed_filter.fatbin ] && cp seed_filter.fatbin ../seed_filter.fatbin
         
         if [ "$DLL_SIZE" == "2.4M" ]; then
             echo -e "${YELLOW}  Note: Size suggests CPU-only. GPU code may not be linked.${NC}"
@@ -248,8 +253,9 @@ if [ "$2" == "--with-tests" ]; then
         -std=c++17 \
         -DGPU_ENABLED \
         -o ../test_cuda.exe \
-        ../src/gpu/test_cuda.cpp \
+        ../src/gpu_experimental/gpu/test_cuda.cpp \
         -I ../src/ \
+        -I ../src/gpu_experimental \
         -static-libgcc \
         -static-libstdc++ \
         2>&1 | tee build_test.log
@@ -264,7 +270,7 @@ fi
 echo -e "\n======================================="
 echo -e "${GREEN}Build complete!${NC}"
 echo ""
-echo "To test: Copy Immolate.dll to your Brainstorm mod folder"
+echo "To test: Copy ImmolateCUDA.dll to your Brainstorm mod folder"
 echo "To verify GPU: Check console output when mod loads"
 echo ""
 echo "Build options:"

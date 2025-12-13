@@ -85,13 +85,12 @@ if [ "$CONTINUE" = true ]; then
     # Clean previous builds
     rm -f ../Immolate.dll build/*.o
     
-    # Build GPU version if available
-    if [ -f "build_gpu.sh" ]; then
-        echo "Building GPU-enabled version..."
-        ./build_gpu.sh
+    echo "Building CPU-only version..."
+    if [ -f "build_cpu.sh" ]; then
+        ./build_cpu.sh
         BUILD_RESULT=$?
     else
-        echo "Building CPU-only version..."
+        echo "build_cpu.sh not found, falling back to build_simple.sh"
         ./build_simple.sh
         BUILD_RESULT=$?
     fi
@@ -155,6 +154,7 @@ echo -e "\n${BLUE}━━━ Step 5: Release Package ━━━${NC}"
 
 if [ "$CONTINUE" = true ]; then
     RELEASE_DIR="release/Brainstorm_v3.0"
+    INCLUDE_GPU=${INCLUDE_GPU:-0}
     echo "Creating release package..."
     
     # Clean and create release directory
@@ -166,11 +166,22 @@ if [ "$CONTINUE" = true ]; then
     cp -r UI "$RELEASE_DIR/"
     cp config.lua "$RELEASE_DIR/"
     cp Immolate.dll "$RELEASE_DIR/"
-    cp seed_filter.* "$RELEASE_DIR/" 2>/dev/null
     cp README.md "$RELEASE_DIR/"
     cp lovely.toml "$RELEASE_DIR/" 2>/dev/null
     cp nativefs.lua "$RELEASE_DIR/" 2>/dev/null
     cp steamodded_compat.lua "$RELEASE_DIR/" 2>/dev/null
+
+    if [ "$INCLUDE_GPU" = "1" ]; then
+        if [ -f "ImmolateCUDA.dll" ]; then
+            cp ImmolateCUDA.dll "$RELEASE_DIR/"
+        fi
+        if ls seed_filter.* > /dev/null 2>&1; then
+            cp seed_filter.* "$RELEASE_DIR/" 2>/dev/null
+        fi
+        if [ -f "gpu_worker.exe" ]; then
+            cp gpu_worker.exe "$RELEASE_DIR/" 2>/dev/null
+        fi
+    fi
     
     # Create version file
     echo "3.0.0" > "$RELEASE_DIR/VERSION"

@@ -1,6 +1,6 @@
 // Minimal CUDA Driver API test harness
 // Tests the exact same loader and context management as the DLL
-#include "../src/gpu/cuda_driver_loader.h"
+#include "../src/gpu_experimental/gpu/cuda_driver_loader.h"
 #include <cstdio>
 #include <thread>
 #include <sstream>

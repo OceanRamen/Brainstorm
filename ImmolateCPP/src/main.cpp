@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 
-long filter(Instance inst) {
-    long legendaries = 0;
+int filter(Instance& inst) {
+    int legendaries = 0;
     inst.nextPack(1);
     for (int p = 1; p <= 3; p++) {
         Pack pack = packInfo(inst.nextPack(1));
@@ -27,7 +27,7 @@ long filter(Instance inst) {
     return legendaries;
 };
 
-long filter_perkeo_observatory(Instance inst) {
+int filter_perkeo_observatory(Instance& inst) {
     if (inst.nextVoucher(1) == Item::Telescope) {
         inst.activateVoucher(Item::Telescope);
         if (inst.nextVoucher(2) != Item::Observatory)
@@ -53,7 +53,7 @@ long filter_perkeo_observatory(Instance inst) {
     return 0;
 }
 
-long filter_negative_tag(Instance inst) {
+int filter_negative_tag(Instance& inst) {
     // Note: If the score cutoff was passed as a variable, this code could be
     // significantly optimized
     int maxAnte = 20;
@@ -65,7 +65,7 @@ long filter_negative_tag(Instance inst) {
     return score;
 }
 
-long filter_lucky(Instance inst) {
+int filter_lucky(Instance& inst) {
     for (int i = 0; i < 7; i++) {
         if (inst.random(RandomType::Lucky_Money) >= 1.0 / 15) {
             return 0;
@@ -74,7 +74,7 @@ long filter_lucky(Instance inst) {
     return 1;
 }
 
-long filter_suas_speedrun(Instance inst) {
+int filter_suas_speedrun(Instance& inst) {
     // First four cards in shop must include Mr. Bones, Merry Andy, and Luchador
     bool bones = false, andy = false, luchador = false;
     for (int i = 0; i < 4; i++) {
@@ -105,7 +105,7 @@ long filter_suas_speedrun(Instance inst) {
     return 3;
 }
 
-long filter_cavendish(Instance inst) {
+int filter_cavendish(Instance& inst) {
     inst.initLocks(1, false, false);
     // Check for a Charm Tag (Arcana Pack)
     if (inst.nextTag(1) != Item::Charm_Tag)
@@ -135,13 +135,11 @@ long filter_cavendish(Instance inst) {
     return 5;
 }
 
-long filter_blank(Instance inst) {
-    return 0;
-}
+int filter_blank(Instance& /*inst*/) { return 0; }
 
 // These won't be permanent filters, just ones I sub in and out while JSON
 // filters aren't ready yet
-long filter_test(Instance inst) {
+int filter_test(Instance& inst) {
     // Four Fingers, Shortcut, and Smeared Joker in first two antes
     // (https://discord.com/channels/1325151824638120007/1326284714125955183)
     bool fingers = false;

@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <cstdio>
-#include "../seed.hpp"
+#include "seed.hpp"
 #include "gpu_types.h"
 
 static HANDLE g_worker_process = nullptr;

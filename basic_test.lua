@@ -51,7 +51,7 @@ if config_file then
   if func then
     print("  ✓ Config syntax valid")
     -- Check for key settings
-    if content:find("use_cuda") then
+    if content:find("use_gpu_experimental") then
       print("  ✓ GPU settings present")
     end
     if content:find("debug_enabled") then

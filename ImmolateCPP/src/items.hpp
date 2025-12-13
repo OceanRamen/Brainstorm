@@ -1579,7 +1579,7 @@ inline std::string itemToString(Item i) {
         return "TYPE END";
     default:
         std::cout << "ERROR; stringToItem found no items... contact dev" << std::endl;
-        EXIT_FAILURE;
+        return "UNKNOWN ITEM";
     }
 }
 inline Item stringToItem(std::string i) {

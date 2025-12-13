@@ -79,7 +79,7 @@ fi
 echo -e "\n${YELLOW}Checking C++ formatting...${NC}"
 if command -v clang-format &> /dev/null; then
     NEEDS_FORMAT=0
-    for file in $(find ImmolateCPP/src -name "*.cpp" -o -name "*.hpp" | head -10); do
+    for file in $(find ImmolateCPP/src -name "*.cpp" -o -name "*.hpp" | head -50); do
         if ! clang-format --dry-run -Werror "$file" 2>/dev/null; then
             NEEDS_FORMAT=1
         fi
@@ -94,6 +94,27 @@ if command -v clang-format &> /dev/null; then
     fi
 else
     echo -e "${YELLOW}⚠ Skipping - clang-format not installed${NC}"
+fi
+
+# Optional clang-tidy (informational)
+echo -e "\n${YELLOW}Checking clang-tidy (informational)...${NC}"
+if command -v clang-tidy &> /dev/null; then
+    if [ -f "ImmolateCPP/compile_commands.json" ]; then
+        TARGET_FILE=$(find ImmolateCPP/src -name "brainstorm_cpu.cpp" | head -1)
+        if [ -n "$TARGET_FILE" ]; then
+            if clang-tidy "$TARGET_FILE" --quiet 2>/dev/null; then
+                echo -e "${GREEN}✓ clang-tidy completed (no blockers)${NC}"
+            else
+                echo -e "${YELLOW}⚠ clang-tidy reported findings (see output above)${NC}"
+            fi
+        else
+            echo -e "${YELLOW}⚠ No target file for clang-tidy${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠ compile_commands.json not found, skipping clang-tidy${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠ clang-tidy not installed${NC}"
 fi
 
 # Run tests

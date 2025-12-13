@@ -10,13 +10,21 @@
     #define IMMOLATE_API
 #endif
 
-// Declare the functions with IMMOLATE_API
-IMMOLATE_API std::string
-brainstorm_cpp(std::string seed, std::string pack, std::string tag, double souls);
+// C API surface shared by CPU and CUDA builds
 extern "C" {
-IMMOLATE_API const char*
-brainstorm(const char* seed, const char* pack, const char* tag, double souls);
+IMMOLATE_API const char* brainstorm(const char* seed,
+                                    const char* voucher,
+                                    const char* pack,
+                                    const char* tag1,
+                                    const char* tag2,
+                                    double souls,
+                                    bool observatory,
+                                    bool perkeo);
+IMMOLATE_API const char* get_tags(const char* seed);
 IMMOLATE_API void free_result(const char* result);
+IMMOLATE_API int get_acceleration_type();      // 0 = CPU, 1 = GPU
+IMMOLATE_API const char* get_hardware_info();  // Human-readable hardware summary
+IMMOLATE_API void set_use_cuda(bool enable);   // No-op on CPU builds
 }
 
 #ifdef __EMSCRIPTEN__

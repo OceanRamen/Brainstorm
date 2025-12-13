@@ -1,7 +1,7 @@
 return {
   ["enable"] = true,
   ["debug_enabled"] = true,
-  ["use_cuda"] = true,
+  ["use_gpu_experimental"] = false,
   ["keybinds"] = {
     ["save_state"] = "z",
     ["f_reroll"] = "r",
