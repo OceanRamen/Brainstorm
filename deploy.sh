@@ -43,6 +43,15 @@ if [ "$CLEAN_TARGET" = "1" ]; then
     mkdir -p "$TARGET/Core" "$TARGET/UI"
 fi
 
+# Always rebuild CPU DLL before deploy
+echo -e "\n${YELLOW}Building CPU DLL...${NC}"
+if (cd ImmolateCPP && ./build_cpu.sh); then
+    echo -e "${GREEN}✓${NC} CPU build complete"
+else
+    echo -e "${RED}✗${NC} CPU build failed"
+    exit 1
+fi
+
 # Deploy CPU DLL (default)
 echo -e "\n${YELLOW}Deploying CPU DLL...${NC}"
 if [ -f "ImmolateCPU.dll" ]; then
