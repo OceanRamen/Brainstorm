@@ -121,13 +121,33 @@ break end
 			if not pack_found then
 				seed_found = nil
 			else
-				-- If searching for a specific joker in buffoon packs
+				-- If searching for a specific joker, check all buffoon packs in both shop slots
 				if seed_found and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
-					if string.find(center.key, "buffoon") then
-						-- Simulate joker generation for the buffoon pack
-						if not simulate_buffoon_pack_jokers(seed_found, center.key) then
-							seed_found = nil
+					local joker_found = false
+					-- Check both shop pack slots for buffoon packs
+					for slot = 1, 2 do
+						local slot_cume, slot_it, slot_center = 0, 0, nil
+						for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
+							if (not _type or _type == v.kind) then slot_cume = slot_cume + (v.weight or 1) end
 						end
+						local slot_poll = pseudorandom(Brainstorm.pseudoseed("shop_pack"..slot..seed_found))*slot_cume
+						for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
+							if not _type or _type == v.kind then slot_it = slot_it + (v.weight or 1) end
+							if slot_it >= slot_poll and slot_it - (v.weight or 1) <= slot_poll then
+								slot_center = v
+								break
+							end
+						end
+						-- If this slot has a buffoon pack, check for the joker
+						if slot_center and string.find(slot_center.key, "buffoon") then
+						if simulate_buffoon_pack_jokers(slot_center.key) then
+								joker_found = true
+								break  -- Early exit once joker is found
+							end
+						end
+					end
+					if not joker_found then
+						seed_found = nil
 					end
 				end
 			end
@@ -198,7 +218,7 @@ function wait(seconds)
 	end
 end
 
-function simulate_buffoon_pack_jokers(seed_found, pack_key)
+function simulate_buffoon_pack_jokers(pack_key)
 	-- Determine joker count based on pack type
 	local joker_count = 2  -- Default for Normal Buffoon
 	if string.find(pack_key, "jumbo") then
@@ -208,9 +228,11 @@ function simulate_buffoon_pack_jokers(seed_found, pack_key)
 	end
 
 	-- Simulate each joker slot in the pack
+	-- Note: Jokers within packs use 'buf' as key_append, with ante 1 for first shop
 	for i = 1, joker_count do
 		-- Determine rarity using Balatro's algorithm
-		local rarity_roll = pseudorandom(Brainstorm.pseudoseed("rarity" .. i .. "sho" .. seed_found))
+		-- Seed pattern: 'rarity' + ante + 'buf' (ante = 1 for first shop)
+		local rarity_roll = pseudorandom(Brainstorm.pseudoseed("rarity1buf"))
 		local rarity = 1  -- Common
 		if rarity_roll > 0.95 then
 			rarity = 3  -- Rare
@@ -219,15 +241,20 @@ function simulate_buffoon_pack_jokers(seed_found, pack_key)
 		end
 
 		-- Select joker from the rarity pool
-		-- Note: G.P_JOKER_RARITY_POOLS[rarity] contains all jokers of that rarity
-		-- pseudorandom_element uses the seed to deterministically pick from the pool
+		-- Seed pattern: 'Joker' + rarity + 'buf' + ante
 		local joker_center = pseudorandom_element(
 			G.P_JOKER_RARITY_POOLS[rarity], 
-			Brainstorm.pseudoseed("Joker" .. rarity .. i .. "sho" .. seed_found)
+			Brainstorm.pseudoseed("Joker" .. rarity .. "buf1")
 		)
 
 		-- Check if this is the joker we're searching for
 		if joker_center and joker_center.key == Brainstorm.SETTINGS.autoreroll.searchJoker then
+			return true
+		end
+	end
+
+	return false
+end
 			return true
 		end
 	end
