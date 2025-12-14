@@ -12,6 +12,17 @@ end
 G.FUNCS.change_search_pack = function(x)
 	Brainstorm.SETTINGS.autoreroll.searchPackID = x.to_key
 	Brainstorm.SETTINGS.autoreroll.searchPack = Brainstorm.SearchPackList[x.to_val]
+	-- Reset joker search when switching away from buffoon packs
+	if not string.find(x.to_val, "Buffoon") then
+		Brainstorm.SETTINGS.autoreroll.searchJokerID = 1
+		Brainstorm.SETTINGS.autoreroll.searchJoker = ""
+	end
+	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
+end
+
+G.FUNCS.change_search_joker = function(x)
+	Brainstorm.SETTINGS.autoreroll.searchJokerID = x.to_key
+	Brainstorm.SETTINGS.autoreroll.searchJoker = Brainstorm.SearchJokerList[x.to_val]
 	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
 
@@ -109,6 +120,16 @@ break end
 			end
 			if not pack_found then
 				seed_found = nil
+			else
+				-- If searching for a specific joker in buffoon packs
+				if seed_found and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
+					if string.find(center.key, "buffoon") then
+						-- Simulate joker generation for the buffoon pack
+						if not simulate_buffoon_pack_jokers(seed_found, center.key) then
+							seed_found = nil
+						end
+					end
+				end
 			end
 		end
 		--[[
@@ -175,6 +196,43 @@ function wait(seconds)
 	while os.clock() - start < seconds do
 		-- Busy wait
 	end
+end
+
+function simulate_buffoon_pack_jokers(seed_found, pack_key)
+	-- Determine joker count based on pack type
+	local joker_count = 2  -- Default for Normal Buffoon
+	if string.find(pack_key, "jumbo") then
+		joker_count = 4  -- Jumbo Buffoon: 4 jokers, pick 1
+	elseif string.find(pack_key, "mega") then
+		joker_count = 4  -- Mega Buffoon: 4 jokers, pick 2
+	end
+
+	-- Simulate each joker slot in the pack
+	for i = 1, joker_count do
+		-- Determine rarity using Balatro's algorithm
+		local rarity_roll = pseudorandom(Brainstorm.pseudoseed("rarity" .. i .. "sho" .. seed_found))
+		local rarity = 1  -- Common
+		if rarity_roll > 0.95 then
+			rarity = 3  -- Rare
+		elseif rarity_roll > 0.7 then
+			rarity = 2  -- Uncommon
+		end
+
+		-- Select joker from the rarity pool
+		-- Note: G.P_JOKER_RARITY_POOLS[rarity] contains all jokers of that rarity
+		-- pseudorandom_element uses the seed to deterministically pick from the pool
+		local joker_center = pseudorandom_element(
+			G.P_JOKER_RARITY_POOLS[rarity], 
+			Brainstorm.pseudoseed("Joker" .. rarity .. i .. "sho" .. seed_found)
+		)
+
+		-- Check if this is the joker we're searching for
+		if joker_center and joker_center.key == Brainstorm.SETTINGS.autoreroll.searchJoker then
+			return true
+		end
+	end
+
+	return false
 end
 
 function Brainstorm.pseudoseed(key, predict_seed)
