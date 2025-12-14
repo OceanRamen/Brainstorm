@@ -255,12 +255,6 @@ function simulate_buffoon_pack_jokers(pack_key)
 
 	return false
 end
-			return true
-		end
-	end
-
-	return false
-end
 
 function Brainstorm.pseudoseed(key, predict_seed)
 	if key == "seed" then
