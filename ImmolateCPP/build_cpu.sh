@@ -2,7 +2,7 @@
 
 # CPU-only build for Brainstorm (primary, stable path)
 echo "======================================="
-echo "  Brainstorm CPU Build (Immolate.dll)"
+echo "  Brainstorm CPU Build (ImmolateCPU.dll)"
 echo "======================================="
 
 RED='\033[0;31m'
@@ -18,6 +18,7 @@ fi
 
 echo -e "${GREEN}✓ MinGW found${NC}"
 
+rm -rf build
 mkdir -p build
 cd build
 
@@ -29,7 +30,7 @@ x86_64-w64-mingw32-g++ \
     -O3 \
     -std=c++17 \
     -DBUILDING_DLL \
-    -o ../Immolate.dll \
+    -o ../ImmolateCPU.dll \
     ../src/brainstorm_cpu.cpp \
     ../src/functions.cpp \
     ../src/items.cpp \
@@ -42,9 +43,9 @@ x86_64-w64-mingw32-g++ \
     -Wl,--export-all-symbols \
     2>&1 | tee build_cpu.log
 
-echo -e "${GREEN}✓ CPU DLL built:${NC} ../Immolate.dll"
+echo -e "${GREEN}✓ CPU DLL built:${NC} ../ImmolateCPU.dll"
 
-DLL_SIZE=$(du -h ../Immolate.dll | cut -f1)
+DLL_SIZE=$(du -h ../ImmolateCPU.dll | cut -f1)
 echo "  Size: ${DLL_SIZE}"
 
 echo -e "\n${GREEN}CPU build complete.${NC}"

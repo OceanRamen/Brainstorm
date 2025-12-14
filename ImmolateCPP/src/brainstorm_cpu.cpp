@@ -46,11 +46,18 @@ FilterConfig make_config(const std::string& voucher,
 }
 
 int apply_filters(Instance& inst, const FilterConfig& cfg) {
+    // Pull blind tags once to avoid multiple RNG advances and reuse for all checks.
+    const bool needs_tags =
+        (cfg.tag1 != Item::RETRY || cfg.tag2 != Item::RETRY || cfg.perkeo);
+    Item small_blind = Item::RETRY;
+    Item big_blind = Item::RETRY;
+    if (needs_tags) {
+        small_blind = inst.nextTag(1);
+        big_blind = inst.nextTag(1);
+    }
+
     // Tag checks (order agnostic, supports duplicate tag requirement)
     if (cfg.tag1 != Item::RETRY || cfg.tag2 != Item::RETRY) {
-        const Item small_blind = inst.nextTag(1);
-        const Item big_blind = inst.nextTag(1);
-
         if (cfg.tag2 == Item::RETRY) {
             if (small_blind != cfg.tag1 && big_blind != cfg.tag1) {
                 return 0;
@@ -69,7 +76,7 @@ int apply_filters(Instance& inst, const FilterConfig& cfg) {
         }
     }
 
-    // Voucher check
+    // Voucher check (first voucher in ante 1)
     if (cfg.voucher != Item::RETRY) {
         inst.initLocks(1, false, false);
         const Item first_voucher = inst.nextVoucher(1);
@@ -78,10 +85,12 @@ int apply_filters(Instance& inst, const FilterConfig& cfg) {
         }
     }
 
-    // Pack check
+    // Pack check: simulate two pack slots in shop (ante 1) and require at least one match.
     if (cfg.pack != Item::RETRY) {
-        inst.cache.generatedFirstPack = true;
-        if (inst.nextPack(1) != cfg.pack) {
+        const Item pack_slot_1 = inst.nextPack(1);
+        const Item pack_slot_2 = inst.nextPack(1);
+        const bool pack_match = (pack_slot_1 == cfg.pack) || (pack_slot_2 == cfg.pack);
+        if (!pack_match) {
             return 0;
         }
     }
@@ -92,16 +101,17 @@ int apply_filters(Instance& inst, const FilterConfig& cfg) {
         if (inst.nextVoucher(1) != Item::Telescope) {
             return 0;
         }
-        inst.cache.generatedFirstPack = true;
-        if (inst.nextPack(1) != Item::Mega_Celestial_Pack) {
+        const Item pack_slot_1 = inst.nextPack(1);
+        const Item pack_slot_2 = inst.nextPack(1);
+        const bool has_celestial =
+            (pack_slot_1 == Item::Mega_Celestial_Pack) || (pack_slot_2 == Item::Mega_Celestial_Pack);
+        if (!has_celestial) {
             return 0;
         }
     }
 
     // Perkeo setup (Investment tag + soul in Arcana)
     if (cfg.perkeo) {
-        const Item small_blind = inst.nextTag(1);
-        const Item big_blind = inst.nextTag(1);
         if (small_blind != Item::Investment_Tag && big_blind != Item::Investment_Tag) {
             return 0;
         }

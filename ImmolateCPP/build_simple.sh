@@ -15,7 +15,7 @@ echo "Compiling CPU-only DLL..."
 # Single command compilation
 x86_64-w64-mingw32-g++ -shared -O2 -std=c++17 \
     -DBUILDING_DLL \
-    -o ../Immolate.dll \
+    -o ../ImmolateCPU.dll \
     src/brainstorm_cpu.cpp \
     src/items.cpp \
     src/rng.cpp \
@@ -27,7 +27,7 @@ x86_64-w64-mingw32-g++ -shared -O2 -std=c++17 \
     -Wl,--export-all-symbols
 
 if [ $? -eq 0 ]; then
-    echo "Success! Created Immolate.dll"
+    echo "Success! Created ImmolateCPU.dll"
 else
     echo "Compilation failed"
 fi

@@ -5,6 +5,7 @@
 
 # Convert Windows path to WSL path
 TARGET="/mnt/c/Users/Krish/AppData/Roaming/Balatro/Mods/Brainstorm"
+TARGET="${TARGET%/}"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -30,12 +31,23 @@ mkdir -p "$TARGET/Core"
 mkdir -p "$TARGET/UI"
 
 DEPLOY_GPU=${DEPLOY_GPU:-0}
+CLEAN_TARGET=${CLEAN_TARGET:-0}
+
+if [ "$CLEAN_TARGET" = "1" ]; then
+    echo -e "\n${YELLOW}Cleaning existing Brainstorm files in target...${NC}"
+    rm -rf "$TARGET/Core" "$TARGET/UI"
+    rm -f "$TARGET"/Immolate*.dll "$TARGET/config.lua" \
+          "$TARGET/lovely.toml" "$TARGET/nativefs.lua" "$TARGET/steamodded_compat.lua" \
+          "$TARGET/seed_filter.ptx" "$TARGET/seed_filter.fatbin" "$TARGET/gpu_worker.exe" \
+          "$TARGET/gpu_driver.log" "$TARGET/brainstorm.log"
+    mkdir -p "$TARGET/Core" "$TARGET/UI"
+fi
 
 # Deploy CPU DLL (default)
 echo -e "\n${YELLOW}Deploying CPU DLL...${NC}"
-if [ -f "Immolate.dll" ]; then
-    DLL_SIZE=$(du -h "Immolate.dll" | cut -f1)
-    if cp "Immolate.dll" "$TARGET/Immolate.dll"; then
+if [ -f "ImmolateCPU.dll" ]; then
+    DLL_SIZE=$(du -h "ImmolateCPU.dll" | cut -f1)
+    if cp "ImmolateCPU.dll" "$TARGET/ImmolateCPU.dll"; then
         echo -e "${GREEN}✓${NC} Deployed CPU DLL (${DLL_SIZE})"
     else
         echo -e "${RED}✗${NC} Failed to copy CPU DLL (permission denied?)"
@@ -43,7 +55,7 @@ if [ -f "Immolate.dll" ]; then
         exit 1
     fi
 else
-    echo -e "${RED}✗${NC} Error: Immolate.dll not found!"
+    echo -e "${RED}✗${NC} Error: ImmolateCPU.dll not found!"
     echo "Build it with: cd ImmolateCPP && ./build_cpu.sh"
     echo "Or fallback: cd ImmolateCPP && ./build_simple.sh"
     exit 1
@@ -54,20 +66,26 @@ if [ "$DEPLOY_GPU" = "1" ]; then
     echo -e "\n${YELLOW}Deploying experimental GPU DLL...${NC}"
     if [ -f "ImmolateCUDA.dll" ]; then
         CUDA_SIZE=$(du -h "ImmolateCUDA.dll" | cut -f1)
-        cp "ImmolateCUDA.dll" "$TARGET/ImmolateCUDA.dll"
-        echo -e "${GREEN}✓${NC} Deployed GPU DLL (${CUDA_SIZE})"
+        if cp "ImmolateCUDA.dll" "$TARGET/ImmolateCUDA.dll"; then
+            echo -e "${GREEN}✓${NC} Deployed GPU DLL (${CUDA_SIZE})"
+        else
+            echo -e "${YELLOW}⚠${NC} Could not copy ImmolateCUDA.dll (permission denied?)"
+        fi
 
         if [ -f "seed_filter.ptx" ]; then
-            cp "seed_filter.ptx" "$TARGET/seed_filter.ptx"
-            echo -e "${GREEN}✓${NC} Deployed CUDA kernel (PTX)"
+            if cp "seed_filter.ptx" "$TARGET/seed_filter.ptx"; then
+                echo -e "${GREEN}✓${NC} Deployed CUDA kernel (PTX)"
+            fi
         fi
         if [ -f "seed_filter.fatbin" ]; then
-            cp "seed_filter.fatbin" "$TARGET/seed_filter.fatbin"
-            echo -e "${GREEN}✓${NC} Deployed CUDA kernel (fatbin)"
+            if cp "seed_filter.fatbin" "$TARGET/seed_filter.fatbin"; then
+                echo -e "${GREEN}✓${NC} Deployed CUDA kernel (fatbin)"
+            fi
         fi
         if [ -f "gpu_worker.exe" ]; then
-            cp "gpu_worker.exe" "$TARGET/gpu_worker.exe"
-            echo -e "${GREEN}✓${NC} Deployed GPU worker process"
+            if cp "gpu_worker.exe" "$TARGET/gpu_worker.exe"; then
+                echo -e "${GREEN}✓${NC} Deployed GPU worker process"
+            fi
         fi
     else
         echo -e "${YELLOW}⚠${NC} Skipping GPU deploy: ImmolateCUDA.dll not found"

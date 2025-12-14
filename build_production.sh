@@ -83,7 +83,7 @@ if [ "$CONTINUE" = true ]; then
     cd ImmolateCPP
     
     # Clean previous builds
-    rm -f ../Immolate.dll build/*.o
+    rm -f ../ImmolateCPU.dll build/*.o
     
     echo "Building CPU-only version..."
     if [ -f "build_cpu.sh" ]; then
@@ -99,7 +99,7 @@ if [ "$CONTINUE" = true ]; then
     
     if [ $BUILD_RESULT -eq 0 ]; then
         echo -e "${GREEN}✓ DLL build successful${NC}"
-        ls -lh Immolate.dll
+        ls -lh ImmolateCPU.dll
     else
         echo -e "${RED}✗ DLL build failed${NC}"
         CONTINUE=false
@@ -165,7 +165,7 @@ if [ "$CONTINUE" = true ]; then
     cp -r Core "$RELEASE_DIR/"
     cp -r UI "$RELEASE_DIR/"
     cp config.lua "$RELEASE_DIR/"
-    cp Immolate.dll "$RELEASE_DIR/"
+    cp ImmolateCPU.dll "$RELEASE_DIR/"
     cp README.md "$RELEASE_DIR/"
     cp lovely.toml "$RELEASE_DIR/" 2>/dev/null
     cp nativefs.lua "$RELEASE_DIR/" 2>/dev/null

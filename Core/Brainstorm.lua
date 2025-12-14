@@ -1027,6 +1027,8 @@ end
 -- The DLL provides high-performance seed filtering without game restarts
 local ffi_loaded = false
 local native_handles = { cpu = nil, gpu = nil }
+local CPU_DLL = "ImmolateCPU.dll"
+local GPU_DLL = "ImmolateCUDA.dll"
 
 -- Initialize FFI definitions for DLL functions
 local function init_ffi()
@@ -1060,7 +1062,7 @@ local function load_cpu_native()
     return native_handles.cpu
   end
 
-  local dll_path = Brainstorm.PATH .. "/Immolate.dll"
+  local dll_path = Brainstorm.PATH .. "/" .. CPU_DLL
   local dll_file = io.open(dll_path, "rb")
   if not dll_file then
     if Brainstorm.debug.enabled then
@@ -1094,7 +1096,7 @@ local function load_gpu_native()
     return native_handles.gpu
   end
 
-  local dll_path = Brainstorm.PATH .. "/ImmolateCUDA.dll"
+  local dll_path = Brainstorm.PATH .. "/" .. GPU_DLL
   local dll_file = io.open(dll_path, "rb")
   if not dll_file then
     if Brainstorm.debug.enabled then
@@ -1202,13 +1204,50 @@ function Brainstorm.auto_reroll()
     Brainstorm.debug.gpu_enabled = false
   end
   -- Extract pack name from configuration
-  local pack = ""
+  local pack_key = ""
   if #Brainstorm.config.ar_filters.pack > 0 then
-    pack = Brainstorm.config.ar_filters.pack[1]:match("^(.*)_") or ""
+    pack_key = Brainstorm.config.ar_filters.pack[1]
   end
-  local pack_name = pack ~= ""
-      and localize({ type = "name_text", set = "Other", key = pack })
-    or ""
+
+  -- Normalize pack keys that have numeric suffixes (e.g., p_spectral_mega_1)
+  local normalized_pack_key = pack_key:gsub("_[%d]+$", "")
+
+  -- Map pack keys to canonical item strings to avoid localization failures
+  local PACK_KEY_TO_NAME = {
+    p_arcana_normal = "Arcana Pack",
+    p_arcana_jumbo = "Jumbo Arcana Pack",
+    p_arcana_mega = "Mega Arcana Pack",
+    p_celestial_normal = "Celestial Pack",
+    p_celestial_jumbo = "Jumbo Celestial Pack",
+    p_celestial_mega = "Mega Celestial Pack",
+    p_standard_normal = "Standard Pack",
+    p_standard_jumbo = "Jumbo Standard Pack",
+    p_standard_mega = "Mega Standard Pack",
+    p_buffoon_normal = "Buffoon Pack",
+    p_buffoon_jumbo = "Jumbo Buffoon Pack",
+    p_buffoon_mega = "Mega Buffoon Pack",
+    p_spectral_normal = "Spectral Pack",
+    p_spectral_jumbo = "Jumbo Spectral Pack",
+    p_spectral_mega = "Mega Spectral Pack",
+  }
+
+  local pack_name = PACK_KEY_TO_NAME[normalized_pack_key] or ""
+
+  if Brainstorm.debug.enabled then
+    log:info("DLL call params", {
+      seed = seed_found,
+      voucher_key = Brainstorm.config.ar_filters.voucher_name,
+      voucher_name = voucher_name,
+      pack_key = pack_key,
+      pack_normalized = normalized_pack_key,
+      pack_name = pack_name,
+      tag1 = Brainstorm.config.ar_filters.tag_name,
+      tag2 = Brainstorm.config.ar_filters.tag2_name,
+      souls = Brainstorm.config.ar_filters.soul_skip,
+      observatory = Brainstorm.config.ar_filters.inst_observatory,
+      perkeo = Brainstorm.config.ar_filters.inst_perkeo,
+    })
+  end
   local tag_name = ""
   if
     Brainstorm.config.ar_filters.tag_name
@@ -1241,6 +1280,29 @@ function Brainstorm.auto_reroll()
       set = "Voucher",
       key = Brainstorm.config.ar_filters.voucher_name,
     }) or ""
+    local VOUCHER_KEY_TO_NAME = {
+      v_overstock_norm = "Overstock",
+      v_clearance_sale = "Clearance Sale",
+      v_hone = "Hone",
+      v_reroll_surplus = "Reroll Surplus",
+      v_crystal_ball = "Crystal Ball",
+      v_telescope = "Telescope",
+      v_grabber = "Grabber",
+      v_wasteful = "Wasteful",
+      v_tarot_merchant = "Tarot Merchant",
+      v_planet_merchant = "Planet Merchant",
+      v_seed_money = "Seed Money",
+      v_blank = "Blank",
+      v_magic_trick = "Magic Trick",
+      v_hieroglyph = "Hieroglyph",
+      v_directors_cut = "Director's Cut",
+      v_paint_brush = "Paint Brush",
+      v_retcon = "Retcon",
+      v_palette = "Palette",
+    }
+    if voucher_name == "" then
+      voucher_name = VOUCHER_KEY_TO_NAME[Brainstorm.config.ar_filters.voucher_name] or ""
+    end
   end
 
   -- Smart compatibility layer: Detect DLL version and use appropriate call
