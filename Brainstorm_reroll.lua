@@ -66,6 +66,11 @@ function Brainstorm.auto_reroll()
 	-- This part is meant to mimic how Balatro rerolls for Gold Stake
 	local extra_num = -0.561892350821
 	local seed_found = nil
+	
+	-- Debug: Show what we're searching for
+	if Brainstorm.SETTINGS.debug_mode and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
+		sendDebugMessage("[Brainstorm] AUTO-REROLL ACTIVE - Searching for joker: " .. Brainstorm.SETTINGS.autoreroll.searchJoker)
+	end
 	while not seed_found and rerollsThisFrame < Brainstorm.SETTINGS.autoreroll.seedsPerFrame do
 		rerollsThisFrame = rerollsThisFrame + 1
 		extra_num = extra_num + 0.561892350821
@@ -100,7 +105,68 @@ function Brainstorm.auto_reroll()
 				end
 			end
 		end
-		if seed_found and Brainstorm.SETTINGS.autoreroll.searchPack and #Brainstorm.SETTINGS.autoreroll.searchPack > 0 then
+		-- Check for joker search (works independently or with pack search)
+		if seed_found and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
+			if Brainstorm.SETTINGS.debug_mode then
+				sendDebugMessage("[Brainstorm] Checking seed: " .. seed_found .. " for joker: " .. Brainstorm.SETTINGS.autoreroll.searchJoker)
+			end
+			local joker_found = false
+			-- Check both shop pack slots for buffoon packs
+			for slot = 1, 2 do
+				local slot_cume, slot_it, slot_center = 0, 0, nil
+				for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
+					if (not _type or _type == v.kind) then slot_cume = slot_cume + (v.weight or 1) end
+				end
+				local slot_poll = pseudorandom(Brainstorm.pseudoseed("shop_pack"..slot..seed_found))*slot_cume
+				for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
+					if not _type or _type == v.kind then slot_it = slot_it + (v.weight or 1) end
+					if slot_it >= slot_poll and slot_it - (v.weight or 1) <= slot_poll then
+						slot_center = v
+						break
+					end
+				end
+				-- If this slot has a buffoon pack, check for the joker
+				if slot_center then
+					if Brainstorm.SETTINGS.debug_mode then
+						sendDebugMessage("[Brainstorm] Slot " .. slot .. " pack: " .. slot_center.key)
+					end
+					if string.find(slot_center.key, "buffoon") then
+						-- If pack search is active, verify this is the right pack type
+						local pack_type_matches = true
+						if Brainstorm.SETTINGS.autoreroll.searchPack and #Brainstorm.SETTINGS.autoreroll.searchPack > 0 then
+							pack_type_matches = false
+							for i = 1, #Brainstorm.SETTINGS.autoreroll.searchPack do
+								if Brainstorm.SETTINGS.autoreroll.searchPack[i] == slot_center.key then
+									pack_type_matches = true
+									break
+								end
+							end
+						end
+						
+						if pack_type_matches then
+							if Brainstorm.SETTINGS.debug_mode then
+								sendDebugMessage("[Brainstorm] Found buffoon pack, simulating...")
+							end
+							if simulate_buffoon_pack_jokers(slot_center.key, seed_found) then
+								if Brainstorm.SETTINGS.debug_mode then
+									sendDebugMessage("[Brainstorm] *** JOKER FOUND! ***")
+								end
+								joker_found = true
+								break  -- Early exit once joker is found
+							else
+								if Brainstorm.SETTINGS.debug_mode then
+									sendDebugMessage("[Brainstorm] Joker not in this pack")
+								end
+							end
+						end
+					end
+				end
+			end
+			if not joker_found then
+				seed_found = nil
+			end
+		elseif seed_found and Brainstorm.SETTINGS.autoreroll.searchPack and #Brainstorm.SETTINGS.autoreroll.searchPack > 0 then
+			-- Pack-only search (no joker specified)
 		    local cume, it, center = 0, 0, nil
 			for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
 				if (not _type or _type == v.kind) then cume = cume + (v.weight or 1 ) end
@@ -120,36 +186,6 @@ break end
 			end
 			if not pack_found then
 				seed_found = nil
-			else
-				-- If searching for a specific joker, check all buffoon packs in both shop slots
-				if seed_found and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
-					local joker_found = false
-					-- Check both shop pack slots for buffoon packs
-					for slot = 1, 2 do
-						local slot_cume, slot_it, slot_center = 0, 0, nil
-						for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
-							if (not _type or _type == v.kind) then slot_cume = slot_cume + (v.weight or 1) end
-						end
-						local slot_poll = pseudorandom(Brainstorm.pseudoseed("shop_pack"..slot..seed_found))*slot_cume
-						for k, v in ipairs(G.P_CENTER_POOLS['Booster']) do
-							if not _type or _type == v.kind then slot_it = slot_it + (v.weight or 1) end
-							if slot_it >= slot_poll and slot_it - (v.weight or 1) <= slot_poll then
-								slot_center = v
-								break
-							end
-						end
-						-- If this slot has a buffoon pack, check for the joker
-						if slot_center and string.find(slot_center.key, "buffoon") then
-						if simulate_buffoon_pack_jokers(slot_center.key) then
-								joker_found = true
-								break  -- Early exit once joker is found
-							end
-						end
-					end
-					if not joker_found then
-						seed_found = nil
-					end
-				end
 			end
 		end
 		--[[
@@ -218,7 +254,11 @@ function wait(seconds)
 	end
 end
 
-function simulate_buffoon_pack_jokers(pack_key)
+function simulate_buffoon_pack_jokers(pack_key, predict_seed)
+	if Brainstorm.SETTINGS.debug_mode then
+		sendDebugMessage("[Brainstorm] simulate_buffoon_pack_jokers called with pack: " .. pack_key .. ", seed: " .. (predict_seed or "nil"))
+	end
+	
 	-- Determine joker count based on pack type
 	local joker_count = 2  -- Default for Normal Buffoon
 	if string.find(pack_key, "jumbo") then
@@ -226,30 +266,68 @@ function simulate_buffoon_pack_jokers(pack_key)
 	elseif string.find(pack_key, "mega") then
 		joker_count = 4  -- Mega Buffoon: 4 jokers, pick 2
 	end
+	if Brainstorm.SETTINGS.debug_mode then
+		sendDebugMessage("[Brainstorm] Simulating " .. joker_count .. " jokers")
+	end
 
+	-- Initialize a temporary RNG state for this simulation
+	-- This mimics how Balatro's G.GAME.pseudorandom works but for prediction
+	local temp_random_state = {}
+	
 	-- Simulate each joker slot in the pack
 	-- Note: Jokers within packs use 'buf' as key_append, with ante 1 for first shop
+	-- IMPORTANT: In Balatro, calling pseudoseed with the same key multiple times
+	-- returns different values because it maintains and advances state for each key
 	for i = 1, joker_count do
 		-- Determine rarity using Balatro's algorithm
 		-- Seed pattern: 'rarity' + ante + 'buf' (ante = 1 for first shop)
-		local rarity_roll = pseudorandom(Brainstorm.pseudoseed("rarity1buf"))
+		-- We need to simulate state advancement, so we'll use a helper that tracks calls
+		local rarity_key = "rarity1buf"
+		if not temp_random_state[rarity_key] then
+			temp_random_state[rarity_key] = pseudohash(rarity_key .. (predict_seed or ''))
+		end
+		temp_random_state[rarity_key] = math.abs(tonumber(string.format("%.13f", (2.134453429141 + temp_random_state[rarity_key] * 1.72431234) % 1)))
+		local rarity_seed_value = (temp_random_state[rarity_key] + (pseudohash(predict_seed) or 0)) / 2
+		local rarity_roll = pseudorandom(rarity_seed_value)
+		
 		local rarity = 1  -- Common
+		local rarity_name = "Common"
 		if rarity_roll > 0.95 then
 			rarity = 3  -- Rare
+			rarity_name = "Rare"
 		elseif rarity_roll > 0.7 then
 			rarity = 2  -- Uncommon
+			rarity_name = "Uncommon"
+		end
+		if Brainstorm.SETTINGS.debug_mode then
+			sendDebugMessage("[Brainstorm]   Joker #" .. i .. " rarity roll: " .. rarity_roll .. " -> " .. rarity_name)
 		end
 
 		-- Select joker from the rarity pool
 		-- Seed pattern: 'Joker' + rarity + 'buf' + ante
-		local joker_center = pseudorandom_element(
-			G.P_JOKER_RARITY_POOLS[rarity], 
-			Brainstorm.pseudoseed("Joker" .. rarity .. "buf1")
-		)
+		local joker_key = "Joker" .. rarity .. "buf1"
+		if not temp_random_state[joker_key] then
+			temp_random_state[joker_key] = pseudohash(joker_key .. (predict_seed or ''))
+		end
+		temp_random_state[joker_key] = math.abs(tonumber(string.format("%.13f", (2.134453429141 + temp_random_state[joker_key] * 1.72431234) % 1)))
+		local joker_seed_value = (temp_random_state[joker_key] + (pseudohash(predict_seed) or 0)) / 2
+		local joker_center = pseudorandom_element(G.P_JOKER_RARITY_POOLS[rarity], joker_seed_value)
 
 		-- Check if this is the joker we're searching for
-		if joker_center and joker_center.key == Brainstorm.SETTINGS.autoreroll.searchJoker then
-			return true
+		if joker_center then
+			if Brainstorm.SETTINGS.debug_mode then
+				sendDebugMessage("[Brainstorm]   Generated: " .. joker_center.key .. " (" .. (joker_center.name or "unknown") .. ")")
+			end
+			if joker_center.key == Brainstorm.SETTINGS.autoreroll.searchJoker then
+				if Brainstorm.SETTINGS.debug_mode then
+					sendDebugMessage("[Brainstorm]   *** MATCH! ***")
+				end
+				return true
+			end
+		else
+			if Brainstorm.SETTINGS.debug_mode then
+				sendDebugMessage("[Brainstorm]   ERROR: Failed to generate joker")
+			end
 		end
 	end
 
