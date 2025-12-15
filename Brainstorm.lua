@@ -10,7 +10,6 @@ function initBrainstorm()
 		local settings_file = STR_UNPACK(nativefs.read((lovely.mod_dir .. "/Brainstorm/settings.lua")))
 		if settings_file ~= nil then
 			Brainstorm.SETTINGS = settings_file
-			-- Ensure new fields have defaults
 			if not Brainstorm.SETTINGS.autoreroll.searchJoker then
 				Brainstorm.SETTINGS.autoreroll.searchJoker = ""
 			end

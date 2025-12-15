@@ -12,11 +12,6 @@ end
 G.FUNCS.change_search_pack = function(x)
 	Brainstorm.SETTINGS.autoreroll.searchPackID = x.to_key
 	Brainstorm.SETTINGS.autoreroll.searchPack = Brainstorm.SearchPackList[x.to_val]
-	-- Reset joker search when switching away from buffoon packs
-	if not string.find(x.to_val, "Buffoon") then
-		Brainstorm.SETTINGS.autoreroll.searchJokerID = 1
-		Brainstorm.SETTINGS.autoreroll.searchJoker = ""
-	end
 	nativefs.write(lovely.mod_dir .. "/Brainstorm/settings.lua", STR_PACK(Brainstorm.SETTINGS))
 end
 
@@ -67,7 +62,6 @@ function Brainstorm.auto_reroll()
 	local extra_num = -0.561892350821
 	local seed_found = nil
 	
-	-- Debug: Show what we're searching for
 	if Brainstorm.SETTINGS.debug_mode and Brainstorm.SETTINGS.autoreroll.searchJoker and Brainstorm.SETTINGS.autoreroll.searchJoker ~= "" then
 		sendDebugMessage("[Brainstorm] AUTO-REROLL ACTIVE - Searching for joker: " .. Brainstorm.SETTINGS.autoreroll.searchJoker)
 	end
