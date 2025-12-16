@@ -10,6 +10,18 @@ function initBrainstorm()
 		local settings_file = STR_UNPACK(nativefs.read((lovely.mod_dir .. "/Brainstorm/settings.lua")))
 		if settings_file ~= nil then
 			Brainstorm.SETTINGS = settings_file
+			if not Brainstorm.SETTINGS.autoreroll.searchJoker then
+				Brainstorm.SETTINGS.autoreroll.searchJoker = ""
+			end
+			if not Brainstorm.SETTINGS.autoreroll.searchJokerID then
+				Brainstorm.SETTINGS.autoreroll.searchJokerID = 1
+			end
+			if not Brainstorm.SETTINGS.autoreroll.searchJokerLocation then
+				Brainstorm.SETTINGS.autoreroll.searchJokerLocation = "any"
+			end
+			if not Brainstorm.SETTINGS.autoreroll.searchJokerLocationID then
+				Brainstorm.SETTINGS.autoreroll.searchJokerLocationID = 1
+			end
 		end
 	end
   _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
