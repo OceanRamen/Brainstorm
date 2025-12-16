@@ -204,9 +204,16 @@ Brainstorm.seedsPerFrame = {
     ["1000"] = 1000,
 }
 
+Brainstorm.SearchJokerLocationList = {
+	["In Any Location"] = "any",
+	["In Any Buffoon Pack"] = "pack",
+	["In Shop Slots"] = "shop",
+}
+
 local searchTagKeys = {"None", "Charm Tag", "Double Tag", "Uncommon Tag", "Rare Tag", "Holographic Tag", "Foil Tag", "Polychrome Tag", "Investment Tag", "Voucher Tag", "Boss Tag", "Juggle Tag", "Coupon Tag", "Economy Tag", "Skip Tag", "D6 Tag"}
 local searchPackKeys = {"None", "Arcana", "Celestial", "Standard", "Buffoon", "Spectral", "Normal Arcana", "Jumbo Arcana", "Mega Arcana", "Normal Celestial", "Jumbo Celestial", "Mega Celestial", "Normal Standard", "Jumbo Standard", "Mega Standard", "Normal Buffoon", "Jumbo Buffoon", "Mega Buffoon", "Normal Spectral", "Jumbo Spectral", "Mega Spectral"}
 local searchJokerKeys = {"None", "8 Ball", "Abstract Joker", "Acrobat", "Ancient Joker", "Arrowhead", "Astronomer", "Banner", "Baron", "Baseball Card", "Blackboard", "Bloodstone", "Blue Joker", "Blueprint", "Bootstraps", "Brainstorm", "Bull", "Burglar", "Burnt Joker", "Business Card", "Caino", "Campfire", "Card Sharp", "Cartomancer", "Castle", "Cavendish", "Ceremonial Dagger", "Certificate", "Chaos the Clown", "Chicot", "Clever Joker", "Cloud 9", "Constellation", "Crafty Joker", "Crazy Joker", "Credit Card", "Delayed Gratification", "Devious Joker", "Diet Cola", "DNA", "Driver's License", "Droll Joker", "Drunkard", "Dusk", "Egg", "Erosion", "Even Steven", "Faceless Joker", "Fibonacci", "Flash Card", "Flower Pot", "Fortune Teller", "Four Fingers", "Gift Card", "Glass Joker", "Gluttonous Joker", "Golden Joker", "Golden Ticket", "Green Joker", "Greedy Joker", "Gros Michel", "Hack", "Half Joker", "Hallucination", "Hanging Chad", "Hiker", "Hit the Road", "Hologram", "Ice Cream", "Invisible Joker", "Joker", "Joker Stencil", "Jolly Joker", "Juggler", "Luchador", "Lucky Cat", "Lusty Joker", "Mad Joker", "Madness", "Mail-In Rebate", "Marble Joker", "Matador", "Merry Andy", "Midas Mask", "Mime", "Misprint", "Mr. Bones", "Mystic Summit", "Obelisk", "Odd Todd", "Onyx Agate", "Oops! All 6s", "Pareidolia", "Perkeo", "Photograph", "Popcorn", "Raised Fist", "Ramen", "Red Card", "Reserved Parking", "Ride the Bus", "Riff-raff", "Rocket", "Rough Gem", "Runner", "Satellite", "Scary Face", "Scholar", "Seance", "Seeing Double", "Seltzer", "Shoot the Moon", "Shortcut", "Showman", "Sixth Sense", "Sly Joker", "Smeared Joker", "Smiley Face", "Sock and Buskin", "Space Joker", "Spare Trousers", "Splash", "Square Joker", "Steel Joker", "Stone Joker", "Stuntman", "Supernova", "Superposition", "Swashbuckler", "The Duo", "The Family", "The Idol", "The Order", "The Tribe", "The Trio", "Throwback", "To Do List", "To the Moon", "Trading Card", "Triboulet", "Troubadour", "Turtle Bean", "Vagabond", "Vampire", "Walkie Talkie", "Wee Joker", "Wily Joker", "Wrathful Joker", "Yorick", "Zany Joker"}
+local searchJokerLocationKeys = {"In Any Location", "In Any Buffoon Pack", "In Shop Slots"}
 local seedsPerFrame = {"500", "750", "1000"}
 -- print(Brainstorm.FUNCS.inspect(searchTagKeys))
 
@@ -260,6 +267,14 @@ function create_tabs(args)
 							options = searchJokerKeys,
 							opt_callback = "change_search_joker",
 							current_option = Brainstorm.SETTINGS.autoreroll.searchJokerID or 1,
+						}),
+						create_option_cycle({
+							label = "Search Joker Location",
+							scale = 0.8,
+							w = 4,
+							options = searchJokerLocationKeys,
+							opt_callback = "change_search_joker_location",
+							current_option = Brainstorm.SETTINGS.autoreroll.searchJokerLocationID or 1,
 						}),
 						create_option_cycle({
 							label = "Charm Tag/Arcana Pack: Number of Souls",

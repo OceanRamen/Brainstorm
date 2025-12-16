@@ -16,6 +16,12 @@ function initBrainstorm()
 			if not Brainstorm.SETTINGS.autoreroll.searchJokerID then
 				Brainstorm.SETTINGS.autoreroll.searchJokerID = 1
 			end
+			if not Brainstorm.SETTINGS.autoreroll.searchJokerLocation then
+				Brainstorm.SETTINGS.autoreroll.searchJokerLocation = "any"
+			end
+			if not Brainstorm.SETTINGS.autoreroll.searchJokerLocationID then
+				Brainstorm.SETTINGS.autoreroll.searchJokerLocationID = 1
+			end
 		end
 	end
   _RELEASE_MODE = not Brainstorm.SETTINGS.debug_mode
