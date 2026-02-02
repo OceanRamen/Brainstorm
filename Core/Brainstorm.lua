@@ -26,6 +26,10 @@ Brainstorm.config = {
     soul_skip = 1,
     inst_observatory = false,
     inst_perkeo = false,
+    joker_key = "",
+    joker_id = 1,
+    joker_location = "any",
+    joker_location_id = 1,
   },
   ar_prefs = {
     spf_id = 3,
@@ -271,6 +275,137 @@ ffi.cdef([[
 const char* brainstorm(const char* seed, const char* voucher, const char* pack, const char* tag, double souls, bool observatory, bool perkeo);
   ]])
 
+-- Joker search helper: simulate RNG for prediction without modifying game state
+local function predict_pseudoseed(key, predict_seed, temp_state)
+  if not temp_state[key] then
+    temp_state[key] = pseudohash(key .. (predict_seed or ""))
+  end
+  temp_state[key] = math.abs(tonumber(string.format("%.13f", (2.134453429141 + temp_state[key] * 1.72431234) % 1)))
+  return (temp_state[key] + (pseudohash(predict_seed) or 0)) / 2
+end
+
+-- Simulate shop jokers for a given seed, returns true if target joker is found
+local function simulate_shop_jokers(predict_seed, target_joker)
+  local shop_slots = 2
+  local temp_state = {}
+  
+  for i = 1, shop_slots do
+    -- Determine card type for this slot
+    local type_seed = predict_pseudoseed("cdt1", predict_seed, temp_state)
+    local type_poll = pseudorandom(type_seed)
+    
+    -- Default rates from base game
+    local joker_rate = 20
+    local total_rate = 20 + 4 + 4 + 4 -- joker + tarot + planet + playing_card
+    local polled_rate = type_poll * total_rate
+    
+    if polled_rate <= joker_rate then
+      -- This slot generates a Joker
+      local rarity_seed = predict_pseudoseed("rarity1sho", predict_seed, temp_state)
+      local rarity_roll = pseudorandom(rarity_seed)
+      
+      local rarity = 1
+      if rarity_roll > 0.95 then
+        rarity = 3
+      elseif rarity_roll > 0.7 then
+        rarity = 2
+      end
+      
+      local joker_seed = predict_pseudoseed("Joker" .. rarity .. "sho1", predict_seed, temp_state)
+      local joker_center = pseudorandom_element(G.P_JOKER_RARITY_POOLS[rarity], joker_seed)
+      
+      if joker_center and joker_center.key == target_joker then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+-- Simulate buffoon pack jokers for a given seed, returns true if target joker is found
+local function simulate_buffoon_pack_jokers(pack_key, predict_seed, target_joker)
+  local joker_count = 2
+  if string.find(pack_key, "jumbo") or string.find(pack_key, "mega") then
+    joker_count = 4
+  end
+  
+  local temp_state = {}
+  
+  for i = 1, joker_count do
+    local rarity_seed = predict_pseudoseed("rarity1buf", predict_seed, temp_state)
+    local rarity_roll = pseudorandom(rarity_seed)
+    
+    local rarity = 1
+    if rarity_roll > 0.95 then
+      rarity = 3
+    elseif rarity_roll > 0.7 then
+      rarity = 2
+    end
+    
+    local joker_seed = predict_pseudoseed("Joker" .. rarity .. "buf1", predict_seed, temp_state)
+    local joker_center = pseudorandom_element(G.P_JOKER_RARITY_POOLS[rarity], joker_seed)
+    
+    if joker_center and joker_center.key == target_joker then
+      return true
+    end
+  end
+  return false
+end
+
+-- Check if seed contains target joker in buffoon packs available in shop
+local function check_buffoon_packs_for_joker(predict_seed, target_joker)
+  local temp_state = {}
+  
+  -- Check both shop pack slots
+  for slot = 1, 2 do
+    local cume, it, center = 0, 0, nil
+    for _, v in ipairs(G.P_CENTER_POOLS["Booster"]) do
+      cume = cume + (v.weight or 1)
+    end
+    
+    local poll_seed = predict_pseudoseed("shop_pack" .. slot, predict_seed, temp_state)
+    local poll = pseudorandom(poll_seed) * cume
+    
+    for _, v in ipairs(G.P_CENTER_POOLS["Booster"]) do
+      it = it + (v.weight or 1)
+      if it >= poll and it - (v.weight or 1) <= poll then
+        center = v
+        break
+      end
+    end
+    
+    if center and string.find(center.key, "buffoon") then
+      if simulate_buffoon_pack_jokers(center.key, predict_seed, target_joker) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+-- Main joker search function, called after FFI returns a candidate seed
+local function check_seed_for_joker(seed, target_joker, location)
+  if not target_joker or target_joker == "" then
+    return true -- No joker filter active
+  end
+  
+  local found = false
+  
+  if location == "shop" or location == "any" then
+    if simulate_shop_jokers(seed, target_joker) then
+      found = true
+    end
+  end
+  
+  if not found and (location == "pack" or location == "any") then
+    if check_buffoon_packs_for_joker(seed, target_joker) then
+      found = true
+    end
+  end
+  
+  return found
+end
+
 function Brainstorm.autoReroll()
   local seed_found = random_string(
     8,
@@ -309,7 +444,19 @@ function Brainstorm.autoReroll()
       Brainstorm.config.ar_filters.inst_perkeo
     )
   )
-  if seed_found then
+  
+  -- Post-filter: check for joker if joker search is active
+  if seed_found and seed_found ~= "" then
+    local target_joker = Brainstorm.config.ar_filters.joker_key
+    local joker_location = Brainstorm.config.ar_filters.joker_location
+    
+    if not check_seed_for_joker(seed_found, target_joker, joker_location) then
+      -- Seed doesn't have the target joker, reject it
+      return nil
+    end
+  end
+  
+  if seed_found and seed_found ~= "" then
     _stake = G.GAME.stake
     G:delete_run()
     G:start_run({
