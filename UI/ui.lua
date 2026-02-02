@@ -73,6 +73,46 @@ local pack_list = {
   ["Jumbo Spectral"] = { "p_spectral_jumbo_1" },
   ["Mega Spectral"] = { "p_spectral_mega_1" },
 }
+
+-- Joker location options for search
+local joker_location_list = {
+  ["Any"] = "any",
+  ["Shop"] = "shop",
+  ["Buffoon Pack"] = "pack",
+}
+
+local joker_location_keys = { "Any", "Shop", "Buffoon Pack" }
+
+-- Dynamic joker list (populated when game data is available)
+local joker_list = { ["None"] = "" }
+local joker_keys = { "None" }
+
+-- Build joker list from game data
+local function build_joker_list()
+  if not G or not G.P_CENTER_POOLS or not G.P_CENTER_POOLS.Joker then
+    return
+  end
+  
+  joker_list = { ["None"] = "" }
+  joker_keys = { "None" }
+  
+  local temp_jokers = {}
+  for _, joker in ipairs(G.P_CENTER_POOLS.Joker) do
+    if joker.key and joker.key ~= "" then
+      local display_name = localize({ type = "name_text", set = "Joker", key = joker.key }) or joker.key
+      table.insert(temp_jokers, { name = display_name, key = joker.key })
+    end
+  end
+  
+  -- Sort alphabetically by display name
+  table.sort(temp_jokers, function(a, b) return a.name < b.name end)
+  
+  for _, joker in ipairs(temp_jokers) do
+    joker_list[joker.name] = joker.key
+    table.insert(joker_keys, joker.name)
+  end
+end
+
 local spf_list = {
   ["500"] = 500,
   ["750"] = 750,
@@ -188,6 +228,18 @@ G.FUNCS.change_suit_ratio = function(x)
 	Brainstorm.writeConfig()
 end
 
+G.FUNCS.change_target_joker = function(x)
+  Brainstorm.config.ar_filters.joker_id = x.to_key
+  Brainstorm.config.ar_filters.joker_key = joker_list[x.to_val]
+  Brainstorm.writeConfig()
+end
+
+G.FUNCS.change_joker_location = function(x)
+  Brainstorm.config.ar_filters.joker_location_id = x.to_key
+  Brainstorm.config.ar_filters.joker_location = joker_location_list[x.to_val]
+  Brainstorm.writeConfig()
+end
+
 Brainstorm.opt_ref = G.FUNCS.options
 G.FUNCS.options = function(e)
   Brainstorm.opt_ref(e)
@@ -196,6 +248,9 @@ end
 local ct = create_tabs
 function create_tabs(args)
   if args and args.tab_h == 7.05 then
+    -- Build joker list when opening settings (game data now available)
+    build_joker_list()
+    
     args.tabs[#args.tabs + 1] = {
       label = "Brainstorm",
       tab_definition_function = function()
@@ -248,6 +303,22 @@ function create_tabs(args)
                   opt_callback = "change_soul_count",
                   current_option = Brainstorm.config.ar_filters.soul_skip + 1
                     or 1,
+                }),
+                create_option_cycle({
+                  label = "AR: JOKER SEARCH",
+                  scale = 0.8,
+                  w = 4,
+                  options = joker_keys,
+                  opt_callback = "change_target_joker",
+                  current_option = Brainstorm.config.ar_filters.joker_id or 1,
+                }),
+                create_option_cycle({
+                  label = "AR: JOKER LOCATION",
+                  scale = 0.8,
+                  w = 4,
+                  options = joker_location_keys,
+                  opt_callback = "change_joker_location",
+                  current_option = Brainstorm.config.ar_filters.joker_location_id or 1,
                 }),
               },
             },
