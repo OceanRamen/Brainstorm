@@ -69,7 +69,12 @@ function Brainstorm.auto_reroll()
 			hashed_seed = pseudohash(seed_found),
 		}
 		if Brainstorm.SETTINGS.autoreroll.searchTag ~= "" then
-			_tag = pseudorandom_element(G.P_CENTER_POOLS["Tag"], Brainstorm.pseudoseed("Tag1" .. seed_found)).key
+			-- Skip the tags the game culls from its pool (Multiplayer removes its own), so the pick matches the real one
+			_tag = pseudorandom_element(G.P_CENTER_POOLS["Tag"], Brainstorm.pseudoseed("Tag1" .. seed_found), {
+				in_pool = function(v)
+					return not (MP and MP.should_exclude_from_pool(v))
+				end,
+			}).key
 			if _tag ~= Brainstorm.SETTINGS.autoreroll.searchTag then
 				seed_found = nil
 			end
@@ -80,7 +85,9 @@ function Brainstorm.auto_reroll()
 				local soul_found = false
 				for i = 1, 5 do
 					if pseudorandom(Brainstorm.pseudoseed("soul_Tarot1" .. seed_found)) > 0.997 then
+						-- The game stops rolling for The Soul once one is in the pack, so the next pack picks up from here
 						soul_found = true
+						break
 					end
 				end
 				if not soul_found then
